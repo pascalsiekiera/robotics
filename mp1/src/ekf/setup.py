@@ -20,7 +20,7 @@ setup(
     zip_safe=True,
     maintainer='psi',
     maintainer_email='Pascal.Siekiera@gmail.com',
-    description='Mini-Project 1: EKF localisation of a turtlebot3 (own EKF + robot_localization)',
+    description='Mini-Project 1: EKF, SLAM (slam_toolbox) and AMCL on a turtlebot3',
     license='TODO: License declaration',
     extras_require={
         'test': [
@@ -32,6 +32,7 @@ setup(
             'ekf_node = ekf.ekf_node:main',
             'ground_truth_node = ekf.ground_truth_node:main',
             'evaluator_node = ekf.evaluator_node:main',
+            'compare_maps = ekf.compare_maps:main',
         ],
     },
 )

@@ -1,0 +1,75 @@
+# nav2_amcl, task 1c (and 2b): Monte Carlo Localization on a known map.
+# Based on turtlebot3_navigation2/param/waffle_pi.yaml; changed values marked with <--.
+#
+# How it works (short): the belief is a set of particles (pose hypotheses).
+#   motion update:  each particle is moved with the odometry increment plus noise
+#                   drawn from the motion model (alpha1..alpha5)
+#   sensor update:  each particle is weighted by how well the laser scan fits the
+#                   map when seen from that particle (likelihood field model)
+#   resampling:     particles are redrawn in proportion to their weights
+#   KLD sampling:   the number of particles adapts between min and max depending
+#                   on how spread out they are (pf_err, pf_z)
+# Filter updates only happen after the robot moved update_min_d / update_min_a.
+
+amcl:
+  ros__parameters:
+    # frames and topics
+    global_frame_id: map
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    scan_topic: scan
+    map_topic: map
+    tf_broadcast: true            # publishes map -> odom
+    transform_tolerance: 0.5
+
+    # initial pose: the dataset (and the map from task 1b) start at the origin
+    set_initial_pose: true        # <-- false; otherwise AMCL waits for "2D Pose Estimate" in RViz
+    always_reset_initial_pose: false
+    first_map_only: false
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+    # particles
+    min_particles: 500
+    max_particles: 2000
+    pf_err: 0.05                  # KLD: max error between true and estimated distribution
+    pf_z: 0.99                    # KLD: confidence (upper quantile)
+    resample_interval: 1
+    update_min_d: 0.1             # <-- 0.25 m; update more often on this short path
+    update_min_a: 0.1             # <-- 0.2 rad
+    recovery_alpha_slow: 0.0      # >0 enables random-particle injection (kidnapping recovery)
+    recovery_alpha_fast: 0.0
+
+    # motion model (odometry noise), DifferentialMotionModel:
+    #   alpha1: rotation noise caused by rotation
+    #   alpha2: rotation noise caused by translation
+    #   alpha3: translation noise caused by translation
+    #   alpha4: translation noise caused by rotation
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2                   # only used by the omni model
+
+    # sensor model (laser)
+    laser_model_type: "likelihood_field"
+    laser_min_range: 0.12         # <-- -1.0 (use scan's value); LDS-01 minimum range
+    laser_max_range: 3.5          # <-- 100.0; LDS-01 maximum range
+    max_beams: 60                 # beams (of 360) used per update
+    laser_likelihood_max_dist: 2.0
+    sigma_hit: 0.2                # std dev of the measurement noise [m]
+    z_hit: 0.5                    # mixture weights of the beam model
+    z_short: 0.05
+    z_max: 0.05
+    z_rand: 0.5
+    lambda_short: 0.1
+    do_beamskip: false
+    beam_skip_distance: 0.5
+    beam_skip_error_threshold: 0.9
+    beam_skip_threshold: 0.3
+
+    save_pose_rate: 0.5

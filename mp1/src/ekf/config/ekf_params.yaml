@@ -1,4 +1,4 @@
-# Parameters of the own EKF (ekf_node) and of the ground-truth converter.
+# Parameters of the own EKF (ekf_node), task 1a.
 # State: [x, y, theta, v, w]. Units: m, rad, s.
 
 ekf_node:
@@ -33,14 +33,3 @@ ekf_node:
     gate_sensors: true
     gate_ground_truth: true
 
-ground_truth_node:
-  ros__parameters:
-    world_frame: map
-    downsampled_rate: 1.0       # Hz, as required by the assignment
-    sigma_xy: 0.02              # m, covariance attached to the 1 Hz ground truth
-    sigma_yaw: 0.03             # rad
-    # drop mocap samples that jump more than  max_jump + max_rate * dt
-    max_jump_xy: 0.05
-    max_speed: 0.5
-    max_jump_yaw: 0.3
-    max_yaw_rate: 2.0
