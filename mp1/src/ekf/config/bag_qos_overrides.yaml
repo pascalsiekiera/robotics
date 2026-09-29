@@ -1,0 +1,7 @@
+# The bag was converted from ROS 1 and stores no QoS. /tf_static must be
+# "latched" (transient local), otherwise TF listeners reject it.
+/tf_static:
+  history: keep_last
+  depth: 1
+  reliability: reliable
+  durability: transient_local
