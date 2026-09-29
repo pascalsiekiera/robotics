@@ -32,6 +32,9 @@ def generate_launch_description():
 
     args = [
         DeclareLaunchArgument(
+            'run_name', default_value='task1a',
+            description='name of the result CSV in ~/ros2_ws/results, e.g. task1a_test1'),
+        DeclareLaunchArgument(
             'map', default_value=os.path.join(datasets_share, 'data', 'map.yaml'),
             description='map yaml (visualisation only)'),
         DeclareLaunchArgument('robot_localization', default_value='true',
@@ -69,7 +72,7 @@ def generate_launch_description():
     )
     evaluator = Node(
         package='ekf', executable='evaluator_node', name='evaluator_node',
-        parameters=[sim_time, {'run_name': 'task1a'}], output='screen',
+        parameters=[sim_time, {'run_name': LaunchConfiguration('run_name')}], output='screen',
     )
 
     return LaunchDescription(args + [

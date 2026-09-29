@@ -36,6 +36,9 @@ def generate_launch_description():
 
     args = [
         DeclareLaunchArgument(
+            'run_name', default_value='task1b',
+            description='name of the result CSV in ~/ros2_ws/results, e.g. task1b_test1'),
+        DeclareLaunchArgument(
             'reference_map', default_value=os.path.join(datasets_share, 'data', 'map.yaml'),
             description='map provided with the dataset, shown for comparison'),
         DeclareLaunchArgument(
@@ -76,7 +79,7 @@ def generate_launch_description():
 
     evaluator = Node(
         package='ekf', executable='evaluator_node', name='evaluator_node',
-        parameters=[sim_time, {'run_name': 'task1b',
+        parameters=[sim_time, {'run_name': LaunchConfiguration('run_name'),
                                'topic_estimators': ['odometry:/odom'],
                                'tf_estimator': 'slam_toolbox'}],
         output='screen',

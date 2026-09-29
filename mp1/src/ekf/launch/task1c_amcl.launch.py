@@ -32,6 +32,9 @@ def generate_launch_description():
 
     args = [
         DeclareLaunchArgument(
+            'run_name', default_value='task1c',
+            description='name of the result CSV in ~/ros2_ws/results, e.g. task1c_test1'),
+        DeclareLaunchArgument(
             'map', default_value=os.path.expanduser(
                 '~/ros2_ws/src/robotics/mp1/maps/map_1b.yaml'),
             description='map built in task 1b'),
@@ -65,7 +68,7 @@ def generate_launch_description():
 
     evaluator = Node(
         package='ekf', executable='evaluator_node', name='evaluator_node',
-        parameters=[sim_time, {'run_name': 'task1c',
+        parameters=[sim_time, {'run_name': LaunchConfiguration('run_name'),
                                'topic_estimators': ['odometry:/odom'],
                                'tf_estimator': 'amcl',
                                'tf_covariance_topic': '/amcl_pose'}],
