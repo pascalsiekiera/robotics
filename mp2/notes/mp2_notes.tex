@@ -1,0 +1,412 @@
+% Working notes for MP2 (Introduction to Robotics, Group 6).
+% Not the final report: collect facts, decisions and results here while working,
+% then shorten them into the report.
+\documentclass[10pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+\newcommand{\pkg}[1]{\texttt{#1}}
+
+\title{MP2 -- Working Notes}
+\author{Group 6}
+\date{started 2026-11-10}
+
+\begin{document}
+\maketitle
+
+% =====================================================================
+\section{Environment}
+\begin{itemize}
+  \item ROS~2 Jazzy, Gazebo Harmonic (\pkg{gz sim}), Ubuntu 24.04 in WSL2 (WSLg for the GUI).
+  \item Gazebo server and GUI start under WSL2 without errors (tested 2026-11-10).
+  \item \pkg{TURTLEBOT3\_MODEL=waffle\_pi}, \pkg{ROS\_DOMAIN\_ID=30}.
+  \item Real robot for Task~2: TurtleBot3 Waffle Pi or TurtleBot4 (our choice). Proposed: TurtleBot3 Waffle Pi
+        (map, AMCL parameters and experience from MP1; same model as in the simulation). \todo{confirm}
+  \item Deadline: end of December 2026.
+\end{itemize}
+
+% =====================================================================
+\section{Task 1a -- Global path planning and path following in simulation}
+
+\subsection{Goal}
+Run Nav2 in Gazebo, set the initial pose and the goal in RViz, and explain how the
+components work together: global planner (path), local planner/controller (velocity
+commands), costmaps, \pkg{amcl}, \pkg{map\_server}. Then vary parameters and compare
+the resulting paths with quantitative metrics.
+
+\subsection{Simulation setup}
+\textbf{Chosen: ROBOTIS simulation} (\pkg{ros-jazzy-turtlebot3-simulations} 2.3.7), as in the
+tutorial of the assignment: \pkg{turtlebot3\_gazebo} (world) + \pkg{turtlebot3\_navigation2/navigation2.launch.py}
+(Nav2 with \pkg{param/waffle\_pi.yaml}).
+Reasons: follows the assignment, robot model Waffle Pi = real robot, DWB (DWA) as default
+controller, and the same parameter file is used for the real robot in Task~2.
+
+For the experiments: own launch file \pkg{mp2/launch/sim.launch.py} with the same world, robot and Nav2 bringup
+(\pkg{bringup\_launch.py} with \pkg{mp2/config/nav2\_params.yaml}), headless by default, robot model without
+camera and with ground-truth pose publisher (see part 2).
+
+Alternative (not used): \pkg{nav2\_bringup/tb3\_simulation\_launch.py} starts Gazebo, Nav2 and RViz in one launch,
+world \pkg{tb3\_sandbox}, model \emph{waffle}, parameters \pkg{nav2\_bringup/params/nav2\_params.yaml} (MPPI controller).
+
+\subsection{Default configuration (as installed)}
+\begin{tabular}{lll}
+\toprule
+Component & \pkg{waffle\_pi.yaml} (ROBOTIS) & \pkg{nav2\_params.yaml} (Nav2) \\
+\midrule
+Global planner & NavFn, \pkg{use\_astar: false} (Dijkstra) & NavFn, \pkg{use\_astar: false} (Dijkstra) \\
+Controller (local planner) & DWB (\pkg{dwb\_core::DWBLocalPlanner}) & MPPI \\
+\bottomrule
+\end{tabular}
+
+\paragraph{TEB.} The Timed Elastic Band controller is not released for ROS~2 Jazzy.
+It is explained in theory only; in practice DWB is compared with MPPI and/or
+Regulated Pure Pursuit (both installed). \textbf{TEB:} optimizes the trajectory as a sequence of timed poses
+(``elastic band'') with respect to travel time, obstacle distance and kinematic limits.
+
+\subsection{Overview: Gazebo vs.\ Nav2 vs.\ RViz}
+\begin{itemize}
+  \item \textbf{Gazebo} replaces the robot and the room: physics, simulated sensors
+        (\pkg{/scan}, \pkg{/odom}, \pkg{/imu}, \pkg{/tf} odom$\rightarrow$base\_footprint), executes \pkg{/cmd\_vel}.
+        Bridged to ROS via \pkg{ros\_gz\_bridge} (\pkg{turtlebot3\_gazebo/params/turtlebot3\_waffle\_pi\_bridge.yaml}).
+  \item \textbf{Nav2} is the robot software: localization (AMCL), global planner, controller.
+        It only sees what a real robot sees (laser, odometry), never the ground truth.
+        In Task~2 Gazebo is replaced by the real TurtleBot, Nav2 stays the same.
+  \item \textbf{RViz}: user interface and visualization only.
+  \item \textbf{Ground truth}: known by Gazebo, but \emph{not} bridged to ROS by default
+        (bridge: clock, joint\_states, odom, tf, cmd\_vel, imu, scan, camera).
+        Needed only for evaluation (deviation metric). Solved in \pkg{mp2/launch/sim.launch.py}: PosePublisher
+        plugin added to the robot model $\Rightarrow$ \pkg{/ground\_truth/pose} (30\,Hz).
+  \item Map \pkg{turtlebot3\_navigation2/map/map.yaml}: 0.05\,m/cell, origin $(-10,-10)$;
+        map frame origin = centre of the hexagonal \pkg{turtlebot3\_world}.
+        Map frame and Gazebo world frame coincide: ground truth at the spawn pose $(-2.0006, -0.5000)$ equals the
+        AMCL initial pose, and the localization error during the drives is 2--7\,cm without a systematic offset.
+\end{itemize}
+
+\subsection{Nav2 architecture}
+\paragraph{TF chain and initial pose.} \pkg{map} $\rightarrow$ \pkg{odom} is published by \pkg{amcl},
+\pkg{odom} $\rightarrow$ \pkg{base\_footprint} by the odometry (in simulation: Gazebo diff-drive plugin),
+\pkg{base\_footprint} $\rightarrow$ \pkg{base\_link} by \pkg{robot\_state\_publisher}.
+In \pkg{waffle\_pi.yaml}, \pkg{set\_initial\_pose: false}: AMCL waits for an initial pose
+(RViz ``2D Pose Estimate'' or topic \pkg{/initialpose}) and publishes no \pkg{map} frame
+until then. Until then the global costmap repeatedly logs
+``Timed out waiting for transform from base\_link to map''. This is expected, not an error.
+Robot spawn pose in \pkg{turtlebot3\_world}: $(x,y) = (-2.0, -0.5)$, yaw 0.
+
+\paragraph{RViz.} RViz is only a client: it sends the initial pose (\pkg{/initialpose}) and the goal
+(action \pkg{navigate\_to\_pose}) and visualizes topics. Nav2 runs without it.
+
+\paragraph{Launch file chain.}
+\begin{itemize}
+  \item \pkg{turtlebot3\_navigation2/navigation2.launch.py}: only selects the files
+        (map \pkg{map/map.yaml}, params \pkg{param/\$TURTLEBOT3\_MODEL.yaml} $=$ \pkg{waffle\_pi.yaml})
+        and starts RViz. Everything else is included from \pkg{nav2\_bringup}.
+  \item \pkg{nav2\_bringup/bringup\_launch.py}: \pkg{slam:=False} $\Rightarrow$ includes
+        \pkg{localization\_launch.py} (otherwise \pkg{slam\_launch.py}) and \pkg{navigation\_launch.py}.
+        \pkg{use\_composition:=True}: all nodes run as components in one process
+        (\pkg{component\_container\_isolated}), hence the log prefix.
+  \item \pkg{localization\_launch.py}: \pkg{map\_server}, \pkg{amcl} + own lifecycle manager.
+  \item \pkg{navigation\_launch.py}: \pkg{controller\_server}, \pkg{smoother\_server}, \pkg{planner\_server},
+        \pkg{route\_server}, \pkg{behavior\_server}, \pkg{velocity\_smoother}, \pkg{collision\_monitor},
+        \pkg{bt\_navigator}, \pkg{waypoint\_follower}, \pkg{docking\_server} + own lifecycle manager.
+\end{itemize}
+
+\paragraph{Lifecycle nodes.} All Nav2 servers are lifecycle nodes
+(unconfigured $\rightarrow$ inactive $\rightarrow$ active). The \pkg{lifecycle\_manager} configures and
+activates them in the listed order, so that e.g.\ the costmaps only start when the map exists.
+
+\paragraph{Nodes relevant for 1a.}
+\begin{tabular}{p{3.2cm}p{5.2cm}p{7.2cm}}
+\toprule
+Node & Input $\rightarrow$ output & Role \\
+\midrule
+\pkg{map\_server} & \pkg{map.yaml} $\rightarrow$ \pkg{/map} & static occupancy grid \\
+\pkg{amcl} & \pkg{/scan}, \pkg{/map}, tf odom $\rightarrow$ tf map$\rightarrow$odom & localization (MP1) \\
+\pkg{bt\_navigator} & action \pkg{navigate\_to\_pose} & executes the behavior tree, calls planner and controller \\
+\pkg{planner\_server} & action \pkg{compute\_path\_to\_pose} $\rightarrow$ \pkg{/plan} & global planner plugin (\pkg{GridBased} = NavFn) on the global costmap \\
+\pkg{controller\_server} & action \pkg{follow\_path} $\rightarrow$ \pkg{cmd\_vel\_nav} & local planner plugin (\pkg{FollowPath} = DWB) on the local costmap, 10\,Hz \\
+\pkg{velocity\_smoother} & \pkg{cmd\_vel\_nav} $\rightarrow$ \pkg{cmd\_vel\_smoothed} & limits velocity and acceleration, 20\,Hz \\
+\pkg{collision\_monitor} & \pkg{cmd\_vel\_smoothed} $\rightarrow$ \pkg{cmd\_vel} & last safety stop/slowdown from raw laser data \\
+\pkg{behavior\_server} & actions spin, backup, wait & recovery behaviors \\
+\bottomrule
+\end{tabular}
+Global and local costmap run inside \pkg{planner\_server} and \pkg{controller\_server}.
+
+\paragraph{Behavior tree} (\pkg{navigate\_to\_pose\_w\_replanning\_and\_recovery.xml}):
+\begin{enumerate}
+  \item \pkg{ComputePathToPose} at 1\,Hz (\pkg{RateController}) $\Rightarrow$ the global path is
+        \emph{replanned every second} from the current pose, not only once.
+  \item \pkg{FollowPath} runs in parallel (\pkg{PipelineSequence}) with the latest path.
+  \item On failure: clear local/global costmap, then recoveries in round robin:
+        spin $90^\circ$, wait 5\,s, back up 0.3\,m; up to 6 retries.
+\end{enumerate}
+
+\paragraph{Velocity command chain.}
+controller (DWB) $\rightarrow$ \pkg{cmd\_vel\_nav} $\rightarrow$ velocity smoother $\rightarrow$
+\pkg{cmd\_vel\_smoothed} $\rightarrow$ collision monitor $\rightarrow$ \pkg{cmd\_vel} $\rightarrow$ Gazebo / robot.
+
+\paragraph{Key parameters (\pkg{waffle\_pi.yaml}).}
+\begin{tabular}{lll}
+\toprule
+Parameter & Value & Meaning \\
+\midrule
+global costmap & static + obstacle + voxel + inflation, 1\,Hz & whole map \\
+local costmap & obstacle + voxel + inflation, $3\times3$\,m rolling window, 5\,Hz & around the robot \\
+\pkg{robot\_radius} & 0.15\,m & circular footprint \\
+\pkg{inflation\_radius} / \pkg{cost\_scaling\_factor} & 0.5\,m / 5.0 & cost decay around obstacles \\
+NavFn \pkg{tolerance} / \pkg{use\_astar} & 0.5\,m / false & goal tolerance of planner / Dijkstra \\
+DWB \pkg{max\_vel\_x} / \pkg{max\_vel\_theta} & 0.3\,m/s / 1.0\,rad/s & \\
+DWB \pkg{vx\_samples} / \pkg{vtheta\_samples} / \pkg{sim\_time} & 20 / 40 / 1.5\,s & sampled velocities, rollout horizon \\
+goal checker \pkg{xy} / \pkg{yaw\_goal\_tolerance} & 0.25\,m / 0.25\,rad & when the goal counts as reached \\
+\bottomrule
+\end{tabular}
+
+Note: \pkg{robot\_radius} 0.15\,m is smaller than the Waffle Pi footprint ($281\times306$\,mm $\Rightarrow$
+circumscribed radius $\approx 0.21$\,m). Relevant with small inflation radius (part 1: 0.20\,m clearance would
+touch a pillar with the real robot). \todo{Task 2: set \pkg{robot\_radius} $\approx 0.21$ or use a footprint polygon.}
+Node graph: TikZ diagram in the progress presentation (\pkg{presentation\_mp2.tex}, slide ``Nav2 Architecture'').
+
+\subsection{Global planner: Dijkstra vs.\ A*}
+\textbf{Dijkstra (NavFn):} expands the grid from one end point in order of accumulated cost (distance + costmap
+cost) until the other end point is reached. \textbf{A*} (\pkg{use\_astar: true}): same, but ordered by cost + a
+distance heuristic to the other end point, so fewer cells should be expanded. \pkg{tolerance} (0.5\,m): if the goal
+cell is blocked, the planner may end at a free cell within this distance.
+
+\subsection{Local planner: DWB (DWA)}
+\textbf{DWB / DWA:} samples velocity pairs $(v,\omega)$ within the dynamically reachable window
+(\pkg{vx\_samples} 20, \pkg{vtheta\_samples} 40), simulates each for \pkg{sim\_time} 1.5\,s and picks the
+trajectory with the best weighted score of the critics (PathDist, PathAlign, GoalDist, GoalAlign, BaseObstacle, ...).
+\textbf{MPPI:} samples many noisy control sequences over a horizon, scores them with cost functions and takes their
+cost-weighted average (installed alternative for the comparison).
+
+\subsection{Costmaps}
+\textbf{Costmap:} grid of costs 0--254 built from layers: static layer (map), obstacle/voxel layer (live laser),
+inflation layer (cost decaying with distance to obstacles, $c(d) = 252\,e^{-\alpha(d - r_\text{robot})}$ for
+$r_\text{robot} < d \le r_\text{infl}$). Global costmap: whole map, used by the planner; local costmap:
+$3\times3$\,m rolling window around the robot, used by the controller.
+
+\subsection{Planned experiments}
+A script based on \pkg{nav2\_simple\_commander} drives the same set of start/goal pairs
+for every configuration, so that the runs are reproducible and comparable. The same
+script and metrics are reused in Task~1b for the RRT planner.
+
+\paragraph{Metrics.} Few metrics that are easy to interpret (quality over quantity).
+Planner metrics evaluate the global planner, the controller metric evaluates path following.
+\begin{itemize}
+  \item \textbf{Path length} $L = \sum_i \lVert \mathbf{p}_{i+1} - \mathbf{p}_i \rVert$ of the planned path [m] (planner)
+  \item \textbf{Planning time} [ms] (planner); small differences expected for Dijkstra vs.\ A*
+        in the small world, more relevant for RRT (random, several runs per goal needed)
+  \item \textbf{Deviation} planned vs.\ driven path [m] (controller): for each driven pose the
+        distance to the nearest point of the planned path; report mean and maximum.
+        Computed with the estimated pose (controller error) and with the Gazebo ground truth
+        (controller + localization error), see part 2.
+  \item \textbf{Minimum clearance} to obstacles along the planned path [m] (planner).
+        Path length alone rewards paths close to walls; clearance shows the trade-off
+        short vs.\ safe that the inflation layer controls.
+\end{itemize}
+Not used: smoothness (visible in the plots), execution time (mostly follows from path
+length), AMCL error (topic of MP1).
+
+\paragraph{Which planned path is evaluated?} The default behavior tree replans every second,
+so there is no single planned path. For RRT (1b) this would give a different random path every
+second and the robot would jump between paths.
+\textbf{Decision:} for all quantitative runs (1a and 1b) we use the behavior tree shipped with Nav2
+\pkg{navigate\_w\_recovery\_and\_replanning\_only\_if\_path\_becomes\_invalid.xml}: plan once,
+replan only if the goal changes or the path becomes blocked in the costmap (\pkg{IsPathValid}).
+Same conditions for Dijkstra, A* and RRT; exactly one planned path per run, so path length,
+clearance and deviation are well defined and the deviation measures only the controller.
+The default replanning behavior (1\,Hz) is only explained/demonstrated in 1a.
+
+\paragraph{Experiment design: dependence between global planner and controller.}
+With the plan-once behavior tree, the global path is computed on the global costmap before the
+robot moves, so the controller has no influence on it. Hence:
+\begin{itemize}
+  \item \textbf{Part 1 -- planner comparison without driving.} Paths are requested via
+        \pkg{ComputePathToPose} with fixed start and goal (\pkg{use\_start: true}); the robot does not move.
+        Metrics: path length, planning time, minimum clearance. Independent of the controller,
+        fast $\Rightarrow$ many start/goal pairs; several repetitions per pair for RRT (random).
+        \textbf{Runs without Gazebo} (\pkg{mp2/launch/planning\_only.launch.py}): only \pkg{map\_server},
+        \pkg{planner\_server} and a static transform map$\rightarrow$base\_link. Reasons (found in a first test
+        with the full simulation):
+        \begin{enumerate}
+          \item The global costmap also contains the obstacle and voxel layer, i.e.\ the \emph{current laser scan},
+                placed with the AMCL pose. With a wrong AMCL pose, the same request gave a different path (P2: 3.32
+                vs.\ 3.61\,m) or no path at all (P1, P3, error 208 \pkg{NO\_VALID\_PATH}). The planned path therefore
+                depends on where the robot is and what it sees. Planning-only: static layer + inflation layer only
+                $\Rightarrow$ identical costmap for every request.
+          \item With \pkg{use\_sim\_time: true}, \pkg{planner\_server} measures the planning time with the
+                Gazebo clock, which advances in steps (reported 0--5\,ms for the same request). Measuring in the
+                client includes the action communication ($\approx$10\,ms without, $\approx$50\,ms with Gazebo running),
+                which is larger than the planning itself. Planning-only: \pkg{use\_sim\_time: false}, the time
+                reported by the server is wall-clock time of the planning alone.
+        \end{enumerate}
+        Same planner and costmap parameters as in the driving runs (the launch file reads \pkg{nav2\_params.yaml}).
+  \item \textbf{Part 2 -- driving.} Reduced (decision 2026-11-10): \textbf{Dijkstra + DWB only}. A* gives
+        almost the same paths, and comparing controllers is not required by the assignment. The controller
+        is kept fixed at DWB; in 1b RRT is driven with DWB as well and compared with Dijkstra + DWB
+        (assumption to state in the report: the deviation depends on planner \emph{and} controller).
+        Setup (\pkg{mp2/launch/sim.launch.py}, \pkg{mp2/scripts/drive\_compare.py}):
+        \begin{itemize}
+          \item Gazebo headless, robot model \emph{without camera} (software rendering + raw image bridge
+                overloaded the CPU under WSL2: real-time factor 0.3, scans every few seconds, Nav2 did not
+                start), with a PosePublisher plugin $\Rightarrow$ ground truth \pkg{/ground\_truth/pose} at 30\,Hz.
+          \item Per pair: drive to the start (not evaluated), then the measured run. Planned path = first
+                \pkg{/plan} message of the run; estimated path = tf map$\rightarrow$base\_footprint at 10\,Hz;
+                true path = ground truth.
+          \item \textbf{Deviation (estimated)} = estimated pose vs.\ planned path: what the controller sees and
+                corrects $\Rightarrow$ controller error. \textbf{Deviation (true)} = ground truth vs.\ planned
+                path $\Rightarrow$ controller + localization error. Plus localization error (estimated vs.\ true).
+                (Correction of an earlier statement: the ground truth does \emph{not} separate the controller
+                error from the localization error, it contains both.)
+          \item Goal checker: \pkg{yaw\_goal\_tolerance} 0.25 $\rightarrow$ 6.29\,rad (heading not checked).
+                With 0.25, P3 failed: robot within 0.25\,m of the goal, rotates in place, DWB gets an empty
+                pruned plan (``Resulting plan has 0 poses''), the plan-once tree does not replan (path still
+                valid), recoveries, goal aborted. Weakness of plan-once; with 1\,Hz replanning this would not occur.
+          \item \pkg{xy\_goal\_tolerance} 0.25\,m kept: start and end of a run differ from the pair coordinates
+                by up to 0.25\,m, so the planned lengths differ from part 1.
+        \end{itemize}
+  \item \textbf{Other parameters} (\pkg{inflation\_radius}, \pkg{cost\_scaling\_factor}, \pkg{robot\_radius}):
+        one at a time from the baseline (Dijkstra + DWB, default parameters), no full factorial design.
+        Note: costmap parameters affect planner \emph{and} controller (both use a costmap).
+\end{itemize}
+
+\paragraph{Configurations (done).}
+\begin{itemize}
+  \item part 1: global planner NavFn Dijkstra vs.\ NavFn A*; costmap \pkg{inflation\_radius} 0.5/0.4/0.3/0.2\,m,
+        \pkg{cost\_scaling\_factor} 2/5/10 (one at a time, Dijkstra)
+  \item part 2: Dijkstra + DWB, default parameters (except \pkg{yaw\_goal\_tolerance}), 3 repetitions
+\end{itemize}
+
+\subsection{Results}
+\paragraph{Part 1, baseline} (NavFn, default costmap: \pkg{robot\_radius} 0.15\,m, \pkg{inflation\_radius} 0.5\,m,
+\pkg{cost\_scaling\_factor} 5.0; 20 requests per pair and planner; data \pkg{mp2/data/task1a/plans\_baseline.*},
+figure \pkg{mp2/figures/plans\_baseline.png}).
+
+\begin{tabular}{llccc}
+\toprule
+Pair & Planner & Length [m] & Planning time [ms] & Min.\ clearance [m] \\
+\midrule
+P1 (straight line 1.10\,m) & Dijkstra & 1.112 & $1.09 \pm 0.23$ & 0.350 \\
+                           & A*       & 1.112 & $1.39 \pm 0.29$ & 0.350 \\
+P2 (straight line 3.20\,m) & Dijkstra & 3.289 & $1.33 \pm 0.38$ & 0.320 \\
+                           & A*       & 3.330 & $1.31 \pm 0.31$ & 0.320 \\
+P3 (straight line 4.53\,m) & Dijkstra & 6.402 & $1.43 \pm 0.30$ & 0.335 \\
+                           & A*       & 6.501 & $2.01 \pm 0.51$ & 0.335 \\
+\bottomrule
+\end{tabular}
+
+Observations:
+\begin{itemize}
+  \item Both planners are deterministic: same path in all 20 requests (std of length 0).
+  \item \textbf{P3: neither planner goes through the pillars}, both take the detour around the pillar field
+        (6.4--6.5\,m instead of 4.5\,m), Dijkstra below/right, A* left/top.
+        Hypothesis: NavFn minimizes the accumulated cost (distance + costmap cost). The gaps between the
+        pillars are 0.8\,m wide, so every point in a gap is within 0.4\,m of a pillar, i.e.\ inside the inflation
+        radius (0.5\,m) $\Rightarrow$ high cost. The outer ring is cheaper despite the longer distance.
+        The two directions around are almost equally expensive (symmetric world), so small differences
+        decide. \textbf{Confirmed} by the costmap sweep below.
+  \item A* is \emph{not} faster than Dijkstra here (1--2\,ms for both). \todo{explain: small map, NavFn
+        implementation (both stop when the start is reached?), overhead of the heuristic}
+  \item Minimum clearance is the same for both planners (0.32--0.35\,m from the robot centre, i.e.\ 0.17--0.20\,m
+        from the robot edge with \pkg{robot\_radius} 0.15\,m).
+\end{itemize}
+
+\paragraph{Part 1, costmap parameters} (Dijkstra, one parameter changed at a time, 10 requests each;
+\pkg{mp2/scripts/run\_costmap\_sweep.sh}; figures \pkg{sweep\_inflation\_dijkstra.png}, \pkg{sweep\_csf\_dijkstra.png}).
+Inflation cost for $r_\text{robot} < d \le r_\text{infl}$: $c(d) = 252\, e^{-\alpha (d - r_\text{robot})}$,
+$\alpha$ = \pkg{cost\_scaling\_factor}; $c = 0$ for $d > r_\text{infl}$.
+Planning time reported as median (single outliers from OS scheduling).
+
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{2}{c}{P1} & \multicolumn{2}{c}{P2} & \multicolumn{2}{c}{P3} \\
+Configuration & $L$ [m] & clear.\ [m] & $L$ [m] & clear.\ [m] & $L$ [m] & clear.\ [m] \\
+\midrule
+$r_\text{infl}=0.5$, $\alpha=5$ (baseline) & 1.112 & 0.350 & 3.289 & 0.320 & 6.402 & 0.335 \\
+$r_\text{infl}=0.4$ & 1.138 & 0.350 & 3.434 & 0.335 & 6.633 & 0.335 \\
+$r_\text{infl}=0.3$ & 1.100 & 0.400 & 3.223 & 0.335 & 5.462 & 0.292 \\
+$r_\text{infl}=0.2$ & 1.100 & 0.400 & 3.200 & 0.335 & 4.906 & 0.200 \\
+$\alpha=2$  & 1.205 & 0.350 & 3.327 & 0.283 & 6.418 & 0.335 \\
+$\alpha=10$ & 1.102 & 0.350 & 3.264 & 0.335 & 6.093 & 0.335 \\
+\bottomrule
+\end{tabular}
+
+Observations:
+\begin{itemize}
+  \item \textbf{Hypothesis confirmed:} with $r_\text{infl} \le 0.3$\,m, the gaps between the pillars are no longer
+        expensive and P3 goes through the pillar field (5.46\,m / 4.91\,m instead of 6.40\,m). Price: the clearance
+        drops to 0.29 / 0.20\,m. 0.20\,m from the robot centre is only 0.05\,m from the edge with
+        \pkg{robot\_radius} 0.15\,m -- and less than the real Waffle Pi radius ($\approx 0.21$\,m), so this path
+        would touch the pillar with the real robot.
+  \item $r_\text{infl}=0.4$ makes P3 and P2 \emph{longer} than the baseline (6.63 / 3.43\,m): the cost drops to 0
+        abruptly at $d = r_\text{infl}$; the cheapest route changes in a non-monotonic way.
+  \item P2 with small $r_\text{infl}$: almost the straight line (3.20\,m), the wall no longer pushes the path away.
+  \item $\alpha$: larger $\alpha$ = cost decays faster = obstacles ``feel'' smaller: $\alpha=10$ shortens P3 to 6.09\,m
+        (partly between the pillars), $\alpha=2$ makes P1 longer (1.21\,m) and P2 closer to the pillars (0.28\,m).
+  \item Planning time 1--2\,ms in all configurations; differences are within the scatter.
+        (Outlier $r_\text{infl}=0.4$/P3 with median 6\,ms: rerun gave 2.75\,ms with identical paths $\Rightarrow$
+        measurement noise; table shows the rerun.) For NavFn the planning time is not a
+        discriminating metric in this small map; it becomes relevant for RRT.
+  \item Trade-off \textbf{short vs.\ safe}: inflation radius and cost scaling factor directly trade path length
+        against clearance.
+\end{itemize}
+
+\paragraph{Part 2, driving} (Dijkstra + DWB, default parameters except \pkg{yaw\_goal\_tolerance}; 3 repetitions
+of all pairs, 9/9 goals reached; data \pkg{mp2/data/task1a/drives\_dijkstra\_dwb\{,\_r2,\_r3\}.json},
+figures \pkg{drives\_dijkstra\_dwb.png} (repetition 1), \pkg{drives\_dijkstra\_dwb\_all.png}).
+Values: mean over the 3 repetitions of the per-run mean; max = largest value of all 3 runs.
+
+\begin{tabular}{lcccccc}
+\toprule
+Pair & planned [m] & time [s] & dev.\ estimated [cm] & dev.\ true [cm] & localization err.\ [cm] \\
+     &             &          & mean (max)            & mean (max)       & mean (max) \\
+\midrule
+P1 & 1.34 & 4.6  & 4.2 (11.4) & 2.9 (9.7)  & 2.2 (4.3) \\
+P2 & 3.47 & 12.6 & 1.9 (5.8)  & 3.9 (10.7) & 5.0 (9.1) \\
+P3 & 6.15 & 24.0 & 4.6 (22.9) & 5.8 (20.1) & 6.6 (11.7) \\
+\bottomrule
+\end{tabular}
+
+Observations:
+\begin{itemize}
+  \item DWB follows the Dijkstra path within a few cm on average (1.9--4.6\,cm); the localization error (AMCL,
+        2--7\,cm) is of the same order, so the true deviation is controller + localization error.
+  \item Largest deviation in P3, always at the same place ($\approx(-1.5,-1.0)$, 4--5\,s after the start): the robot
+        cuts $\approx$\,20\,cm to the right of the path (towards the bottom-left pillar) instead of following the path
+        along the wall. Hypothesis: DWB critics trade path following (PathDist, PathAlign, scale 32) against progress
+        to the goal (GoalDist, GoalAlign, scale 24). \todo{check, e.g.\ with higher PathDist.scale}
+  \item P1: larger deviation in repetitions 2/3 (5--6\,cm) than in 1 (1\,cm): with \pkg{yaw\_goal\_tolerance} disabled,
+        the robot reaches the start with an arbitrary heading and turns at the beginning of the run.
+  \item Replanning: 1 plan per run, except repetition 1 / P2 (2 plans, path became invalid once).
+  \item Robot stops 0.15--0.26\,m before the goal (\pkg{xy\_goal\_tolerance} 0.25\,m).
+  \item First attempt (before fixing the recorder) showed 0.3--0.5\,m deviation in P2: partly caused by queued
+        messages from the drive to the start (fixed by time-stamp filtering); not reproduced in 3 clean repetitions.
+\end{itemize}
+
+\subsection{Open questions (for the TA, progress meeting 2026-11-11)}
+\begin{itemize}
+  \item Is the planning-only setup (without Gazebo) acceptable for the planner comparison?
+        Fallback: run the same requests once in the full simulation (robot localized at the start)
+        and show that the paths are the same.
+  \item Only DWB as controller (TEB not available in Jazzy) -- is a controller comparison expected?
+  \item Why is A* not faster than Dijkstra in NavFn? \todo{}
+\end{itemize}
+
+\subsection{Pitfalls}
+\begin{itemize}
+  \item Leftover processes: \pkg{gz sim} can survive Ctrl+C and keeps publishing \pkg{/clock}, \pkg{/scan},
+        \pkg{/tf}; leftover \pkg{static\_transform\_publisher} (map$\rightarrow$base\_link from the planning-only
+        setup) split the TF tree of the simulation (``Timed out waiting for transform from base\_link to odom'').
+        Check with \pkg{pgrep -fa "gz sim|ros2 launch|static\_transform"} before starting.
+  \item Camera of the Waffle Pi: software rendering + raw image bridge overloaded the CPU under WSL2
+        (real-time factor 0.3, Nav2 did not start) $\Rightarrow$ removed in \pkg{sim.launch.py}.
+  \item Messages queue up while a node does not spin and are delivered later $\Rightarrow$ filter by time stamp.
+  \item \pkg{nav2\_simple\_commander}: \pkg{BasicNavigator.waitUntilNav2Active()} publishes an initial pose at
+        $(0,0)$ if it does not receive an \pkg{amcl\_pose}, which resets AMCL. Our scripts wait only for the
+        node they need (\pkg{\_waitForNodeToActivate}).
+\end{itemize}
+
+\end{document}

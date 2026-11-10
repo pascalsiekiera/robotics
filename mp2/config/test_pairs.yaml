@@ -1,0 +1,11 @@
+# Start/goal pairs for Task 1a/1b in turtlebot3_world (map frame, metres).
+# Start and goal heading: direction of the straight line from start to goal.
+P1:  # short, straight: lane between two pillar rows
+  start: [-0.55, -0.55]
+  goal: [0.55, -0.55]
+P2:  # along the edge: between left wall and left pillar column
+  start: [-1.6, -1.6]
+  goal: [-1.6, 1.6]
+P3:  # bottom left -> top right: straight line goes through three pillars
+  start: [-1.6, -1.6]
+  goal: [1.6, 1.6]
