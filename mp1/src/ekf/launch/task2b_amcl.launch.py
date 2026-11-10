@@ -45,7 +45,7 @@ def generate_launch_description():
     args = [
         DeclareLaunchArgument('bag', default_value=os.path.join(mp1, 'data', '2a_scan_1'),
                               description='bag recorded with the real robot'),
-        DeclareLaunchArgument('map', default_value=os.path.join(mp1, 'maps', 'map_2a_new.yaml'),
+        DeclareLaunchArgument('map', default_value=os.path.join(mp1, 'maps', 'map_2a_merged.yaml'),
                               description='map from task 2a'),
         DeclareLaunchArgument('amcl_params',
                               default_value=os.path.join(pkg_share, 'config', 'amcl.yaml'),
@@ -103,10 +103,14 @@ def generate_launch_description():
         output='screen',
     )], condition=IfCondition(LaunchConfiguration('play_bag')))
 
-    # setsid: own process group, so Ctrl+C reaches the recorder only once (via launch).
-    # Getting SIGINT twice (terminal + launch) makes ros2 bag record hang on shutdown.
+    # ros2 bag record (Jazzy) sometimes hangs when it is stopped with SIGINT (Ctrl+C),
+    # but always closes the bag cleanly on SIGTERM. So: run it in its own session
+    # (setsid, Ctrl+C in the terminal does not reach it) inside a small bash wrapper
+    # that turns the SIGINT sent by launch into a SIGTERM for the recorder.
     record = ExecuteProcess(
-        cmd=['setsid', 'ros2', 'bag', 'record',
+        cmd=['setsid', 'bash', '-c',
+             'ros2 bag record "$@" & P=$!; trap "kill -TERM $P" INT TERM; wait $P; wait $P',
+             'record',
              '-o', [os.path.expanduser('~/ros2_ws/results/bags/'),
                     LaunchConfiguration('run_name'), time.strftime('_%Y%m%d_%H%M%S')],
              '--topics', '/amcl_pose', '/odom', '/tf', '/tf_static', '/scan', '/map'],
