@@ -59,9 +59,26 @@ def path_length(xy):
     return float(np.sum(np.linalg.norm(np.diff(xy, axis=0), axis=1)))
 
 
+def densify(xy, step=0.075):
+    """Polyline with extra points so that consecutive points are at most step [m] apart.
+
+    Default 0.075 m: just above a cell diagonal (0.0707 m), so NavFn paths (one pose per cell) stay
+    unchanged; longer segments (RRT) are split. A finer step would move points of paths that run
+    along a cell border into the neighbouring cell and change the 1a values by one cell (5 cm)."""
+    xy = np.atleast_2d(np.asarray(xy, dtype=float))
+    out = [xy[:1]]
+    for a, b in zip(xy[:-1], xy[1:]):
+        n = max(1, int(np.ceil(np.linalg.norm(b - a) / step)))
+        out.append(a + (b - a) * (np.arange(1, n + 1) / n)[:, None])
+    return np.vstack(out)
+
+
 def min_clearance(xy, static_map):
-    """Smallest distance [m] of the path to an obstacle of the static map (from the robot centre)."""
-    return float(np.min(static_map.clearance(xy)))
+    """Smallest distance [m] of the path to an obstacle of the static map (from the robot centre).
+
+    Checked along the segments, not only at the poses: RRT paths have poses every 0.2 m, smoothed
+    paths only a few poses (NavFn: one pose per cell, unchanged)."""
+    return float(np.min(static_map.clearance(densify(xy))))
 
 
 def deviation(driven_xy, planned_xy):
@@ -77,3 +94,22 @@ def deviation(driven_xy, planned_xy):
     closest = a[None] + t[..., None] * ab[None]
     d = np.linalg.norm(driven[:, None, :] - closest, axis=2)
     return d.min(axis=1)
+
+
+def deviation_active(samples, plans, plan_times):
+    """Deviation [m] of each sample (t, x, y) from the plan that was active at time t.
+
+    Active plan = the last plan with time stamp <= t (the first plan for earlier samples). With
+    replanning (RRT: the controller got stuck, the new plan is a different random route) the
+    deviation from the first plan would measure the change of the route, not the path following.
+    With one plan this is the same as deviation()."""
+    samples = np.atleast_2d(samples)
+    idx = np.searchsorted(np.asarray(plan_times), samples[:, 0], side='right') - 1
+    idx = np.clip(idx, 0, len(plans) - 1)
+    d = np.empty(len(samples))
+    for k, plan in enumerate(plans):
+        sel = idx == k
+        if sel.any():
+            d[sel] = deviation(samples[sel, 1:], plan)
+    return d
+

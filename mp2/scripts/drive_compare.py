@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Task 1a, part 2: drive the start/goal pairs in Gazebo and measure the path following.
+"""Task 1a part 2 and Task 1b: drive the start/goal pairs in Gazebo and measure the path following.
 
 For every pair: drive to the start (not evaluated), then send the goal and record
-  - the planned path (/plan, published by planner_server; with the plan-once behavior
-    tree this is the path the controller follows; replans are counted),
+  - the planned paths (/plan, published by planner_server; with the plan-once behavior
+    tree normally one per run; a new plan comes if the path becomes invalid or the controller
+    fails, with RRT then a different random route),
   - the estimated path: tf map -> base_footprint (AMCL + odometry) at 10 Hz,
   - the true path from the Gazebo ground truth (/ground_truth/odom under Humble,
     /ground_truth/pose under Jazzy, see sim.launch.py).
-Metrics: deviation from the planned path
+Metrics: deviation from the planned path that was active at that time (the last plan received
+before the sample; with one plan simply the planned path)
   - of the estimated path: what the controller sees and corrects (controller error),
   - of the true path: controller error + localization error.
 
@@ -27,6 +29,7 @@ Requires: ros2 launch mp2/launch/sim.launch.py [controller:=teb]
 Example:
     python3 drive_compare.py --planner GridBased --tag dijkstra_dwb
     python3 drive_compare.py --planner GridBased --tag dijkstra_teb   # with controller:=teb
+    python3 drive_compare.py --planner RRT --tag rrt_dwb --out mp2/data/task1b   # planner:=rrt
 """
 import argparse
 import json
@@ -46,7 +49,7 @@ from rclpy.qos import DurabilityPolicy, QoSProfile
 from rclpy.time import Time
 from tf2_ros import Buffer, TransformException, TransformListener
 
-from metrics import deviation, path_length
+from metrics import deviation_active, path_length
 
 PLAN_STAMP_MARGIN = 0.5  # [s], see Recorder.on_plan
 
@@ -105,7 +108,7 @@ class Recorder:
         self.t0 = math.inf
 
     def reset(self):
-        self.plans, self.gt, self.est, self.plan_msgs = [], [], [], []
+        self.plans, self.plan_times, self.gt, self.est, self.plan_msgs = [], [], [], [], []
 
     def on_plan(self, msg):
         if not math.isinf(self.t0):  # diagnostics: every plan received during a run
@@ -115,6 +118,7 @@ class Recorder:
         # start is several seconds older
         if stamp(msg) >= self.t0 - PLAN_STAMP_MARGIN and msg.poses:
             self.plans.append([[p.pose.position.x, p.pose.position.y] for p in msg.poses])
+            self.plan_times.append(stamp(msg))
 
     def on_gt(self, msg):
         pose = msg.pose.pose if isinstance(msg, Odometry) else msg.pose
@@ -266,6 +270,7 @@ def main():
         nav.info(f'{name}: measured run to ({gx}, {gy}), AMCL error at start {start_err:.3f} m')
         rec.start()
         result, wall_s = navigate(nav, make_pose(nav, gx, gy, yaw), args.timeout)
+        t_start = rec.t0
         rec.stop()
 
         run = {'tag': args.tag, 'pair': name, 'planner': args.planner,
@@ -283,8 +288,9 @@ def main():
         planned = np.array(rec.plans[0])
         gt = np.array(rec.gt)
         est = np.array(rec.est)
-        dev_est = deviation(est[:, 1:], planned)
-        dev_true = deviation(gt[:, 1:], planned)
+        plans = [np.array(p) for p in rec.plans]
+        dev_est = deviation_active(est, plans, rec.plan_times)
+        dev_true = deviation_active(gt, plans, rec.plan_times)
         # localization error: estimated vs true pose at the time stamps of the estimate
         gt_at_est = np.column_stack([np.interp(est[:, 0], gt[:, 0], gt[:, i]) for i in (1, 2)])
         loc_err = np.linalg.norm(est[:, 1:] - gt_at_est, axis=1)
@@ -301,6 +307,9 @@ def main():
             'localization_error_max_m': float(loc_err.max()),
             'final_error_m': float(np.hypot(gt[-1, 1] - gx, gt[-1, 2] - gy)),
             'planned': planned.round(4).tolist(),
+            # all plans of the run: time [s] after the start of the run and path (the first = planned)
+            'plans': [{'t': round(t - t_start, 3), 'path': np.array(p).round(4).tolist()}
+                      for t, p in zip(rec.plan_times, rec.plans)],
             'ground_truth': gt.round(4).tolist(),
             'estimated': est.round(4).tolist(),
         })

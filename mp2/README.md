@@ -3,17 +3,18 @@
 Mini-Project 2 of Introduction to Robotics (IST 2026/27), Group 6.
 Status: Task 1a done under **ROS 2 Humble** (part 1: planner comparison, part 2: driving with
 Dijkstra + DWB and Dijkstra + TEB, videos). All results are from Humble (the lab robot runs Humble;
-TEB and the RRT skeleton of Task 1b need Humble).
+TEB and the RRT package of Task 1b need Humble).
 An earlier version under Jazzy is archived and not used: `jazzy/`, `data/task1a_jazzy/`, `figures/jazzy/`.
 
 Working notes with all decisions, parameters and results: [notes/mp2_notes.tex](notes/mp2_notes.tex)
-(compile in Overleaf).
+(compile in Overleaf). All design decisions per task, as the basis for the report:
+[notes/report-notes.md](notes/report-notes.md) (LaTeX: `notes/report_notes.tex`).
 
 ## Requirements
 
 - Ubuntu 22.04 + ROS 2 Humble, Gazebo Classic 11, Nav2, TurtleBot3 simulation
 - source packages in `~/ros2_ws/src`: `teb_local_planner` (branch `humble-devel`),
-  `costmap_converter` (branch `humble`), `rrt_planner` (Task 1b skeleton)
+  `costmap_converter` (branch `humble`), and a link to `mp2/rrt_planner` (our RRT, Task 1b)
 - Python: numpy, scipy, matplotlib, pillow, pyyaml; ffmpeg + xwininfo for the videos
 
 Setup on Windows/WSL2 (a second distro next to the Jazzy one):
@@ -25,7 +26,7 @@ wsl --install -d Ubuntu-22.04
 mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
 git clone -b humble-devel https://github.com/rst-tu-dortmund/teb_local_planner.git
 git clone -b humble https://github.com/rst-tu-dortmund/costmap_converter.git
-git clone https://github.com/irob-labs-ist/rrt_planner.git
+ln -s <path>/mp2/rrt_planner rrt_planner   # our RRT planner (Task 1b), lives in this repo
 git -C teb_local_planner apply <path>/mp2/setup/teb_plan_transform.patch   # see Pitfalls
 sudo bash <path>/mp2/setup/install_humble.sh   # ROS, Nav2, TB3, Gazebo, rosdep, ~/.bashrc
 cd ~/ros2_ws && MAKEFLAGS=-j2 colcon build --symlink-install --parallel-workers 1
@@ -39,6 +40,10 @@ program cc1plus`).
 repo; at every start via `/etc/wsl.conf`, by hand: `sudo mount-robotics`). The path in the script
 is for our machine (`\\wsl.localhost\Ubuntu\home\maya\...`); with the repo cloned inside 22.04
 this part is not needed.
+`mp2/rrt_planner` is our RRT planner (based on https://github.com/irob-labs-ist/rrt_planner, see its README).
+`mp2/COLCON_IGNORE` keeps a colcon build in the Jazzy workspace (which builds `mp1` from this repo)
+out of `mp2`: the planner uses the Humble Nav2 interface. The link in the Humble workspace points to
+the package directly and is not affected.
 Do not run the Jazzy and the Humble simulation at the same time: both distros share the network,
 so the ROS nodes would see each other (or use different `ROS_DOMAIN_ID`s).
 
@@ -64,14 +69,21 @@ mp2/
 │   ├── compare_setups.py     part 1: control run, planning-only setup vs. full simulation
 │   ├── record_video.sh       records the RViz window during drive_compare.py (ffmpeg)
 │   ├── drive_compare.py      part 2: drives all pairs, records planned/estimated/true path
-│   └── plot_drives.py        part 2: summary table + figure of the driven paths
+│   ├── plot_drives.py        part 2: summary table + figure of the driven paths
+│   ├── run_rrt_experiments.sh  1b: RRT baseline + one variant per parameter (no Gazebo)
+│   └── plot_rrt.py           1b: summary table + figures of the RRT plans
+├── rrt_planner/              Task 1b: RRT global planner plugin, linked into ~/ros2_ws/src
 ├── setup/install_humble.sh   one-time setup of the Humble environment
 ├── jazzy/                    Jazzy versions of nav2_params.yaml, sim.launch.py, mp2.rviz (archived)
 ├── data/task1a/              results (plans_<tag>.json / .csv), launch logs of the sweep
+├── data/task1b/              RRT results (plans_rrt_<tag>.json / .csv), launch logs
 ├── data/task1a_jazzy/        the same under Jazzy (archived)
 ├── figures/                  generated figures
 ├── videos/                   RViz recordings (task1a_*.mp4; videos/jazzy/: archived Jazzy videos)
-└── notes/mp2_notes.tex       working notes for the report
+└── notes/
+    ├── mp2_notes.tex         working notes for the report (facts, parameters, results)
+    ├── report-notes.md       all design decisions per task, basis for the report
+    └── report_notes.tex      the same as LaTeX (generated from report-notes.md)
 ```
 
 ## Changes in `config/nav2_params.yaml` (vs. `waffle_pi.yaml`)
@@ -181,9 +193,10 @@ python3 mp2/scripts/plot_plans.py mp2/data/task1a/plans_{baseline,fullsim}.json 
 | Metric | Definition | Evaluates |
 |---|---|---|
 | path length | sum of segment lengths of the planned path [m] | planner |
+| success rate, iterations, tree nodes | RRT only (`/rrt/stats`); failed plans run up to `max_num_nodes` iterations | planner (1b) |
 | planning time | time reported by `planner_server` (wall clock in the planning-only setup) [ms], reported as median | planner |
-| min. clearance | smallest distance of the path to an occupied cell of the static map, from the robot centre [m] | planner |
-| deviation (estimated) | distance of each estimated pose (tf map → base_footprint, 10 Hz) to the nearest point of the planned path, mean and max [m] | controller (part 2) |
+| min. clearance | smallest distance of the path to an occupied cell of the static map, from the robot centre, checked along the segments [m] | planner |
+| deviation (estimated) | distance of each estimated pose (tf map → base_footprint, 10 Hz) to the nearest point of the planned path that was active at that time (after a replan: the new plan), mean and max [m] | controller (part 2) |
 | deviation (true) | same with the Gazebo ground truth | controller + localization (part 2) |
 | localization error | estimated vs. true pose (for interpreting the two deviations) [m] | AMCL (part 2) |
 
@@ -274,7 +287,63 @@ Tables and observations: [notes/mp2_notes.tex](notes/mp2_notes.tex), section "Re
 | `drives_dijkstra_teb.png`, `drives_dijkstra_teb_all.png` | part 2, TEB: the same (repetition 3 / P3: detour between the pillars) |
 | `control_run_fullsim.png` | part 1 control run: planning-only vs. full simulation |
 | `rviz_p3_dijkstra_dwb.png` | RViz screenshot at the end of P3 (planned, estimated, true path) |
+| `rrt_summary.png` | 1b: success rate, length, clearance, iterations per RRT configuration and pair, Dijkstra as reference |
+| `rrt_paths_<config>.png` | 1b: all 50 RRT paths per pair of one configuration, Dijkstra for reference |
+| `drives_rrt_dwb_all.png`, `drives_rrt_smooth_dwb_all.png`, `drives_rrt_thr128_dwb_all.png` | 1b driving: planned (first and later plans), estimated and true path |
 | `rviz_p3_dijkstra_teb_local_plan.png` | TEB on P3: the local plan (blue) loops between the pillars (alternative route) |
+
+## Task 1b
+
+RRT as Nav2 global planner plugin: `rrt_planner/` (algorithm, parameters and topics in its README).
+It is loaded as planner `RRT` next to `GridBased` (Dijkstra) and `AStar`.
+
+### Planner comparison (no Gazebo)
+
+Same setup and pairs as Task 1a part 1. Baseline = plain RRT (step 0.2 m, goal bias 0, cost
+threshold 253, no smoothing, seed 1); every variant changes one parameter:
+
+| Tag | Change |
+|---|---|
+| `rrt_base` | - |
+| `rrt_step0.5` | `rrt.step` 0.5 m |
+| `rrt_bias0.1` | `rrt.goal_bias` 0.1 |
+| `rrt_thr128` | `rrt.cost_threshold` 128 (robot centre > 0.29 m from obstacles instead of > 0.15 m) |
+| `rrt_smooth` | `rrt.smoothing` true |
+
+```bash
+bash mp2/scripts/run_rrt_experiments.sh 50          # 5 configurations x 3 pairs x 50 plans, ~1 min
+python3 mp2/scripts/plot_rrt.py mp2/data/task1b/plans_rrt_*.json   # table + figures
+```
+
+A single configuration by hand:
+```bash
+ros2 launch mp2/launch/planning_only.launch.py rrt_goal_bias:=0.1            # terminal 1
+python3 mp2/scripts/plan_compare.py --planners RRT --reps 50 --tag rrt_bias0.1 --out mp2/data/task1b
+```
+
+### Driving (Gazebo)
+
+RRT + DWB: plain, smoothed and with cost threshold 128, 3 repetitions each, compared with
+Dijkstra + DWB (Task 1a part 2). `planner:=rrt` uses a copy of the plan-once behavior tree with
+`planner_id="RRT"`:
+
+```bash
+ros2 launch mp2/launch/sim.launch.py planner:=rrt                         # terminal 1
+python3 mp2/scripts/drive_compare.py --planner RRT --tag rrt_dwb --out mp2/data/task1b   # and _r2, _r3
+# smoothed: terminal 1 with planner:=rrt rrt_smoothing:=true, tags rrt_smooth_dwb{,_r2,_r3}
+# threshold: terminal 1 with planner:=rrt rrt_cost_threshold:=128, tags rrt_thr128_dwb{,_r2,_r3}
+python3 mp2/scripts/plot_drives.py mp2/data/task1b/drives_rrt_dwb{,_r2,_r3}.json --name drives_rrt_dwb_all
+```
+
+**Replanning:** RRT paths (cost threshold 253) pass the pillars at the minimum distance. During a
+run Nav2 then often plans again (path invalid in the live costmap, controller stuck, or RRT found no
+path), and RRT returns a different random route. The deviation is therefore computed against the
+plan that was active at each moment (all plans of a run are stored under `plans`), and the number of
+plans per run is reported. With `rrt_cost_threshold:=128` no measured run needed a second plan.
+
+Additional metrics for RRT (from `/rrt/stats`): success rate, iterations and tree nodes per plan.
+With the fixed seed the runs are reproducible: the same configuration started fresh with the same
+request order gives the same paths. Dijkstra reference: `data/task1a/plans_baseline.json`.
 
 ## Pitfalls
 

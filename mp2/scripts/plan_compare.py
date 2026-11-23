@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Task 1a, part 1: compare global planners without driving.
+"""Task 1a part 1 and Task 1b: compare global planners without driving.
 
 For every start/goal pair and every planner, request a path N times via the
 ComputePathToPose action (use_start=True, so the robot does not have to be at the
 start and does not move). Stores the paths and the metrics path length, planning
-time and minimum clearance.
+time and minimum clearance. For the RRT planner also the iterations and tree nodes
+(topic /rrt/stats, published by the plugin after every plan, also for failed plans).
 
 Requires the planning-only setup (no Gazebo, fixed costmap, wall-clock time):
     ros2 launch mp2/launch/planning_only.launch.py
 
 Example:
     python3 plan_compare.py --planners GridBased AStar --reps 10 --tag baseline
+    python3 plan_compare.py --planners RRT --reps 50 --tag rrt_base --out mp2/data/task1b
 """
 import argparse
 import csv
@@ -25,6 +27,7 @@ import yaml
 from action_msgs.msg import GoalStatus
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
+from std_msgs.msg import Float64MultiArray
 
 from metrics import StaticMap, min_clearance, path_length
 
@@ -41,6 +44,17 @@ def make_pose(nav, x, y, yaw):
     pose.pose.orientation.z = math.sin(yaw / 2)
     pose.pose.orientation.w = math.cos(yaw / 2)
     return pose
+
+
+def wait_for_stats(nav, stats, n_before, timeout=2.0):
+    """Wait until a new /rrt/stats message arrived; return it as a dict or None."""
+    end = time.monotonic() + timeout
+    while len(stats) == n_before and time.monotonic() < end:
+        rclpy.spin_once(nav, timeout_sec=0.05)
+    if len(stats) == n_before:
+        return None
+    success, iterations, nodes, poses = stats[-1]
+    return {'rrt_success': bool(success), 'iterations': int(iterations), 'tree_nodes': int(nodes)}
 
 
 def main():
@@ -63,6 +77,8 @@ def main():
     # Only the planner is needed. Not waitUntilNav2Active(): it publishes an initial pose
     # at (0, 0) if no amcl_pose arrives and would reset the localization.
     nav._waitForNodeToActivate('planner_server')
+    stats = []  # /rrt/stats messages: [success, iterations, tree nodes, path poses]
+    nav.create_subscription(Float64MultiArray, '/rrt/stats', lambda m: stats.append(list(m.data)), 10)
 
     runs = []
     for pair_name, pair in pairs.items():
@@ -71,6 +87,7 @@ def main():
         start, goal = make_pose(nav, sx, sy, yaw), make_pose(nav, gx, gy, yaw)
         for planner in args.planners:
             for rep in range(args.reps):
+                n_stats = len(stats)
                 t0 = time.perf_counter()
                 result = nav._getPathImpl(start, goal, planner_id=planner, use_start=True)
                 wall_ms = (time.perf_counter() - t0) * 1e3
@@ -78,6 +95,8 @@ def main():
                       and len(result.path.poses) > 1)
                 run = {'tag': args.tag, 'pair': pair_name, 'planner': planner, 'rep': rep,
                        'success': ok}
+                if planner == 'RRT':
+                    run.update(wait_for_stats(nav, stats, n_stats) or {})
                 if ok:
                     xy = np.array([[p.pose.position.x, p.pose.position.y]
                                    for p in result.path.poses])
@@ -94,7 +113,8 @@ def main():
                     })
                     nav.info(f'{pair_name} {planner} #{rep}: '
                              f'{run["length_m"]:.2f} m, {run["planning_time_ms"]:.2f} ms, '
-                             f'clearance {run["min_clearance_m"]:.2f} m')
+                             f'clearance {run["min_clearance_m"]:.2f} m'
+                             + (f', {run["iterations"]} iterations' if 'iterations' in run else ''))
                 else:
                     nav.warn(f'{pair_name} {planner} #{rep}: no path '
                              f'(error {getattr(result, "error_code", "?")})')
@@ -106,7 +126,7 @@ def main():
 
     csv_path = os.path.join(args.out, f'plans_{args.tag}.csv')
     fields = ['tag', 'pair', 'planner', 'rep', 'success', 'planning_time_ms',
-              'roundtrip_ms', 'length_m', 'min_clearance_m', 'n_poses']
+              'roundtrip_ms', 'length_m', 'min_clearance_m', 'n_poses', 'iterations', 'tree_nodes']
     with open(csv_path, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
         writer.writeheader()

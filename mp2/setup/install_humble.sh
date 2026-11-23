@@ -2,7 +2,8 @@
 # One-time setup of the ROS 2 Humble environment for MP2 (Ubuntu 22.04, e.g. the WSL distro
 # "Ubuntu-22.04"). Installs ROS 2 Humble, Nav2, TurtleBot3 + Gazebo Classic 11, the Python
 # packages of the mp2 scripts and the dependencies of the source packages in ~/ros2_ws/src
-# (teb_local_planner, costmap_converter, rrt_planner - clone them before running this).
+# (teb_local_planner, costmap_converter - clone them before running this - and the link
+# rrt_planner -> mp2/rrt_planner, see README).
 # Usage (inside Ubuntu 22.04):
 #     sudo bash install_humble.sh
 # Afterwards, as normal user:

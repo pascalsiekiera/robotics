@@ -1,0 +1,256 @@
+[INFO] [launch]: All log files can be found below /home/kiama/.ros/log/2026-11-23-16-30-47-629010-matchalaptop-5740
+[INFO] [launch]: Default logging verbosity is set to INFO
+[planning_only] RRT: goal_tolerance 0.2, rrt.step 0.2, rrt.min_num_nodes 200, rrt.max_num_nodes 5000, rrt.goal_bias 0.1, rrt.cost_threshold 253, rrt.smoothing False, rrt.seed 1
+[planning_only] global costmap: robot_radius 0.15, inflation_radius 0.5, cost_scaling_factor 5.0
+[INFO] [map_server-1]: process started with pid [5744]
+[INFO] [planner_server-2]: process started with pid [5746]
+[INFO] [static_transform_publisher-3]: process started with pid [5748]
+[INFO] [lifecycle_manager-4]: process started with pid [5750]
+[static_transform_publisher-3] [INFO] [1795451447.844477420] [static_transform_publisher_zU8NaQKhBjPhDoAZ]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('-2.000000', '-0.500000', '0.000000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'map' to 'base_link'
+[lifecycle_manager-4] [INFO] [1795451447.854092356] [lifecycle_manager_planning]: Creating
+[planner_server-2] [INFO] [1795451447.856172156] [planner_server]: 
+[planner_server-2] 	planner_server lifecycle node launched. 
+[planner_server-2] 	Waiting on external lifecycle transitions to activate
+[planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[lifecycle_manager-4] [INFO] [1795451447.857567187] [lifecycle_manager_planning]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[map_server-1] [INFO] [1795451447.877168355] [map_server]: 
+[map_server-1] 	map_server lifecycle node launched. 
+[map_server-1] 	Waiting on external lifecycle transitions to activate
+[map_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[map_server-1] [INFO] [1795451447.877339099] [map_server]: Creating
+[lifecycle_manager-4] [INFO] [1795451447.877628301] [lifecycle_manager_planning]: [34m[1mStarting managed nodes bringup...[0m[0m
+[lifecycle_manager-4] [INFO] [1795451447.877670836] [lifecycle_manager_planning]: [34m[1mConfiguring map_server[0m[0m
+[map_server-1] [INFO] [1795451447.878100793] [map_server]: Configuring
+[map_server-1] [INFO] [1795451447.878163301] [map_io]: Loading yaml file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.yaml
+[map_server-1] [INFO] [1795451447.878442611] [map_io]: resolution: 0.05
+[map_server-1] [INFO] [1795451447.878453133] [map_io]: origin[0]: -10
+[map_server-1] [INFO] [1795451447.878456861] [map_io]: origin[1]: -10
+[map_server-1] [INFO] [1795451447.878460173] [map_io]: origin[2]: 0
+[map_server-1] [INFO] [1795451447.878463739] [map_io]: free_thresh: 0.196
+[map_server-1] [INFO] [1795451447.878467317] [map_io]: occupied_thresh: 0.65
+[map_server-1] [INFO] [1795451447.878471201] [map_io]: mode: trinary
+[map_server-1] [INFO] [1795451447.878475277] [map_io]: negate: 0
+[map_server-1] [INFO] [1795451447.878649715] [map_io]: Loading image_file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm
+[map_server-1] [INFO] [1795451447.893561289] [map_io]: Read map /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm: 384 X 384 map @ 0.05 m/cell
+[lifecycle_manager-4] [INFO] [1795451447.899581240] [lifecycle_manager_planning]: [34m[1mConfiguring planner_server[0m[0m
+[planner_server-2] [INFO] [1795451447.906320162] [planner_server]: Creating
+[planner_server-2] [INFO] [1795451447.916814887] [global_costmap.global_costmap]: 
+[planner_server-2] 	global_costmap lifecycle node launched. 
+[planner_server-2] 	Waiting on external lifecycle transitions to activate
+[planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[planner_server-2] [INFO] [1795451447.917268903] [global_costmap.global_costmap]: Creating Costmap
+[planner_server-2] [INFO] [1795451447.919866964] [planner_server]: Configuring
+[planner_server-2] [INFO] [1795451447.919923984] [global_costmap.global_costmap]: Configuring
+[planner_server-2] [INFO] [1795451447.925169735] [global_costmap.global_costmap]: Using plugin "static_layer"
+[planner_server-2] [INFO] [1795451447.928564595] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
+[planner_server-2] [INFO] [1795451447.929928566] [global_costmap.global_costmap]: Initialized plugin "static_layer"
+[planner_server-2] [INFO] [1795451447.929963054] [global_costmap.global_costmap]: Using plugin "inflation_layer"
+[planner_server-2] [INFO] [1795451447.930862643] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
+[planner_server-2] [INFO] [1795451447.940403451] [planner_server]: Created global planner plugin GridBased of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795451447.940468443] [planner_server]: Configuring plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451447.940927055] [planner_server]: Created global planner plugin AStar of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795451447.940983464] [planner_server]: Configuring plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451447.942654172] [planner_server]: Created global planner plugin RRT of type rrt_planner/RRTPlannerROS
+[planner_server-2] [INFO] [1795451447.946705011] [planner_server]: [RRTPlannerROS] Configured with goal_tolerance=0.20, step=0.20, min_nodes=200, max_nodes=5000, goal_bias=0.10, cost_threshold=253, smoothing=0, seed=1
+[planner_server-2] [INFO] [1795451447.946783543] [planner_server]: Planner Server has GridBased AStar RRT  planners available.
+[lifecycle_manager-4] [INFO] [1795451447.957730880] [lifecycle_manager_planning]: [34m[1mActivating map_server[0m[0m
+[map_server-1] [INFO] [1795451447.957970768] [map_server]: Activating
+[map_server-1] [INFO] [1795451447.958316679] [map_server]: Creating bond (map_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451447.958727558] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 384 X 384 at 0.050000 m/pix
+[lifecycle_manager-4] [INFO] [1795451448.062951003] [lifecycle_manager_planning]: Server map_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795451448.063118514] [lifecycle_manager_planning]: [34m[1mActivating planner_server[0m[0m
+[planner_server-2] [INFO] [1795451448.063738768] [planner_server]: Activating
+[planner_server-2] [INFO] [1795451448.063870326] [global_costmap.global_costmap]: Activating
+[planner_server-2] [INFO] [1795451448.063898520] [global_costmap.global_costmap]: Checking transform
+[planner_server-2] [INFO] [1795451448.064238921] [global_costmap.global_costmap]: start
+[planner_server-2] [INFO] [1795451448.114665688] [planner_server]: Activating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451448.114815862] [planner_server]: Activating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451448.116929601] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[lifecycle_manager-4] [INFO] [1795451448.225785388] [lifecycle_manager_planning]: Server planner_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795451448.225977477] [lifecycle_manager_planning]: [34m[1mManaged nodes are active[0m[0m
+[lifecycle_manager-4] [INFO] [1795451448.226000601] [lifecycle_manager_planning]: [34m[1mCreating bond timer...[0m[0m
+[planner_server-2] [INFO] [1795451452.537563034] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.544148264] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.549159182] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.554199825] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.558784390] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.563310608] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.568343245] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.573350903] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.577833537] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.582944522] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.587795125] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.593067227] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.598956712] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.605029946] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.609816040] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.614603230] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.621174392] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.628854683] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.635230957] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.640613158] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.646372438] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.652749361] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.663764517] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.671826404] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.679701175] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.687828468] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.694773976] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.704369210] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.713022587] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.721008152] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.726950242] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.733297313] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.753812305] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.760688952] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.766776331] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.772075516] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.781355116] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.787970433] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.794928271] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.816555694] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.822525200] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.842113275] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.849732942] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.859175848] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.870706744] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.880530254] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.890514156] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.900322723] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.911266926] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.921720406] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451452.931448971] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.944669581] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.957010433] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.965381060] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.973449129] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.983915404] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.991212721] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451452.998114403] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.005582798] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.014236734] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.026362214] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.035188769] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.042453641] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.049452815] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.058907518] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.066985932] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.076292003] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.084347511] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.091912094] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.099174592] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.107325266] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.115233055] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.123530036] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.133789169] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.142477637] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.150755821] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.161307290] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.171832190] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.183617055] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.192678876] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.202406082] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.211301178] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.226999642] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.238568020] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.247768777] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.257368786] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.266079766] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.275637683] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.286211148] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.296648239] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.308768986] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.320703697] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.329519403] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.338308660] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.350214388] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.359949842] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.371428408] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.380640602] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.388925522] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.397414841] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.406495248] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.416152507] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.425722193] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.434823554] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.445281385] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.460224541] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.475480799] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.487764130] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.499593129] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.511563692] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.522335675] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.537042027] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.558027719] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.585063209] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.609948752] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.635228351] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.658958716] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.674060389] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.695336208] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.717006673] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.727930265] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.738407689] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.749651613] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.762157645] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.780417685] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.804782804] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.817811787] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.828615339] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.842610437] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.854999376] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.865820063] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.878401765] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.891339775] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.908682184] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.933170372] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.946452231] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.961554261] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.976827777] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451453.992710900] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.010935220] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.036725792] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.064793035] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.092842350] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.117595567] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.143558853] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.175953734] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.205077886] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.219615969] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.230886401] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451454.246794036] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[static_transform_publisher-3] [INFO] [1795451454.705687427] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795451454.705719173] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795451454.705923314] [lifecycle_manager_planning]: Running Nav2 LifecycleManager rcl preshutdown (lifecycle_manager_planning)
+[lifecycle_manager-4] [INFO] [1795451454.705994753] [lifecycle_manager_planning]: [34m[1mTerminating bond timer...[0m[0m
+[map_server-1] [INFO] [1795451454.705769573] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[map_server-1] [INFO] [1795451454.705960971] [map_server]: Running Nav2 LifecycleNode rcl preshutdown (map_server)
+[map_server-1] [INFO] [1795451454.706177827] [map_server]: Deactivating
+[map_server-1] [INFO] [1795451454.706244172] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451454.705795227] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[planner_server-2] [INFO] [1795451454.705921076] [planner_server]: Running Nav2 LifecycleNode rcl preshutdown (planner_server)
+[planner_server-2] [INFO] [1795451454.706064443] [planner_server]: Deactivating
+[planner_server-2] [INFO] [1795451454.706133174] [global_costmap.global_costmap]: Deactivating
+[map_server-1] [INFO] [1795451454.717434437] [map_server]: Cleaning up
+[map_server-1] [INFO] [1795451454.717786324] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[map_server-1] [INFO] [1795451454.724245337] [map_server]: Destroying
+[lifecycle_manager-4] [INFO] [1795451454.740793611] [lifecycle_manager_planning]: Destroying lifecycle_manager_planning
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 5748]
+[INFO] [map_server-1]: process has finished cleanly [pid 5744]
+[INFO] [lifecycle_manager-4]: process has finished cleanly [pid 5750]
+[planner_server-2] [INFO] [1795451455.064868636] [planner_server]: Deactivating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.065196856] [planner_server]: Deactivating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.065234362] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451455.075941988] [planner_server]: Cleaning up
+[planner_server-2] [INFO] [1795451455.088729023] [global_costmap.global_costmap]: Cleaning up
+[planner_server-2] [INFO] [1795451455.094927353] [planner_server]: Cleaning up plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.095254188] [planner_server]: Cleaning up plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.095310238] [planner_server]: Destroying plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.095327777] [planner_server]: Destroying plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451455.106500199] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451455.114064598] [global_costmap.global_costmap]: Destroying
+[planner_server-2] [INFO] [1795451455.122351760] [planner_server]: Destroying
+[INFO] [planner_server-2]: process has finished cleanly [pid 5746]

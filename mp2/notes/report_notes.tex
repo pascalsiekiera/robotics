@@ -1,0 +1,253 @@
+% Decisions of MP2 (basis for the report), generated from notes/report-notes.md (same content).
+% Edit the Markdown file and regenerate, or edit both.
+\documentclass[10pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\newcommand{\pkg}[1]{\texttt{#1}}
+\setcounter{secnumdepth}{1}
+\renewcommand{\thesection}{\arabic{section}}
+\setcounter{section}{-1}
+
+\title{MP2 -- Decisions (basis for the report)}
+\author{Group 6: Maya Aul, Pascal Siekiera}
+\date{2026-11-23}
+
+\begin{document}
+\maketitle
+Group 6 (Maya Aul, Pascal Siekiera). Collected 2026-11-23. Every design decision of Task 1 so far,
+sorted by task: what was decided, the alternatives, why, and what it means for the results.
+Details, numbers and figures: \pkg{notes/mp2\_notes.tex}. The same content as LaTeX: \pkg{notes/report\_notes.tex}.
+
+Marked \textbf{(technical)}: implementation choices made while building, not discussed as a design
+question; they still belong in the report where they affect the results.
+
+\section{General}
+
+\subsection*{0.1 ROS 2 Humble only (2026-11-23)}
+\begin{itemize}
+  \item \textbf{Decision:} all results of Task 1 come from ROS 2 Humble (Ubuntu 22.04, Gazebo Classic 11, Nav2 1.1.20).
+  \item \textbf{Alternatives:} keep Jazzy (first version of Task 1a); compare Jazzy and Humble.
+  \item \textbf{Why:} TEB (controller comparison, requested in the progress meeting 2026-11-11) only exists as a ROS 2 port up to Humble; DWB and TEB must run in the same environment; the lab robot runs Humble.
+  \item \textbf{Consequence:} Jazzy files archived (\pkg{jazzy/}, \pkg{data/task1a\_jazzy/}, \pkg{figures/jazzy/}, \pkg{videos/jazzy/}), not compared and not reported.
+\end{itemize}
+
+\subsection*{0.2 Simulation: ROBOTIS TurtleBot3 simulation, Waffle Pi, \pkg{turtlebot3\_world}}
+\begin{itemize}
+  \item \textbf{Alternatives:} \pkg{nav2\_bringup/tb3\_simulation\_launch.py} (other world, model \emph{waffle}, MPPI); TurtleBot 4.
+  \item \textbf{Why:} follows the assignment tutorial; Waffle Pi = robot planned for Task 2; DWB is the default controller.
+  \item \textbf{Open:} TurtleBot3 vs. TurtleBot4 for Task 2 not confirmed yet.
+\end{itemize}
+
+\subsection*{0.3 Few, interpretable metrics}
+\begin{itemize}
+  \item \textbf{Decision:} path length, planning time, minimum clearance (planner); deviation planned vs. driven path (controller). Task 1b adds success rate and iterations/tree nodes (needed for a random planner).
+  \item \textbf{Not used:} smoothness, execution time as main metric, AMCL error as metric (topic of MP1; reported only to interpret the deviation).
+  \item \textbf{Why:} quality over quantity; every number must be explainable.
+\end{itemize}
+
+\subsection*{0.4 Plan once instead of replanning every second}
+\begin{itemize}
+  \item \textbf{Decision:} behavior tree \pkg{navigate\_w\_recovery\_and\_replanning\_only\_if\_path\_becomes\_invalid.xml} for all quantitative runs (1a and 1b).
+  \item \textbf{Alternative:} default tree (replans at 1\,Hz).
+  \item \textbf{Why:} exactly one planned path per run, so length, clearance and deviation are well defined; with RRT a 1\,Hz replan would give a new random path every second.
+  \item \textbf{Consequence:} replanning still happens if the path becomes invalid or the controller fails (relevant for RRT, see 2.10). Weakness found in 1a: with \pkg{yaw\_goal\_tolerance} active the robot could rotate at the goal without a path (see 1.7).
+\end{itemize}
+
+\subsection*{0.5 Start/goal pairs P1--P3 (\pkg{config/test\_pairs.yaml})}
+\begin{itemize}
+  \item P1 short, straight, between two pillar rows (1.1\,m); P2 along the left wall (3.2\,m); P3 bottom left $\rightarrow$ top right, straight line through three pillars (4.5\,m).
+  \item \textbf{Why:} three typical situations (open lane, wall + pillars, obstacles in the direct line); the same pairs for 1a and 1b.
+\end{itemize}
+
+\subsection*{0.6 Use of AI (DUIA)}
+\begin{itemize}
+  \item Code of the RRT functions (Task 1b) was written by Claude (AI) at our request and read and checked by us; scripts, launch files and analysis also with AI assistance. Must be declared in the DUIA.
+\end{itemize}
+
+\section{Task 1a -- Global planning and path following in simulation}
+
+\subsection*{1.1 Part 1 (planner comparison) without Gazebo}
+\begin{itemize}
+  \item \textbf{Decision:} planning-only setup (\pkg{launch/planning\_only.launch.py}): only \pkg{map\_server}, \pkg{planner\_server} and a static transform; global costmap = static + inflation layer; wall-clock time.
+  \item \textbf{Alternative:} request the paths in the full simulation.
+  \item \textbf{Why:} in the full simulation the global costmap contains the live laser scan placed with the AMCL pose $\rightarrow$ the same request gave different paths or none; planning time with the sim clock is not usable (10\,Hz clock under Gazebo Classic $\rightarrow$ always 0\,ms).
+  \item \textbf{Control run:} the same requests in the full simulation give the same paths (within 2\,cm), except A*/P3 (other way around the pillar field, almost equally expensive). Answers the question from the progress meeting ``how was this done without Gazebo?''.
+\end{itemize}
+
+\subsection*{1.2 Global planners: NavFn Dijkstra vs. NavFn A*}
+\begin{itemize}
+  \item 20 requests per pair and planner (deterministic, so repetitions only for the planning time).
+  \item \textbf{Open for the report:} why A* is not faster than Dijkstra here.
+\end{itemize}
+
+\subsection*{1.3 Costmap parameters: one at a time}
+\begin{itemize}
+  \item \textbf{Decision:} vary \pkg{inflation\_radius} (0.5 / 0.4 / 0.3 / 0.2\,m) and \pkg{cost\_scaling\_factor} (2 / 5 / 10) one at a time from the baseline, Dijkstra only, 10 requests each.
+  \item \textbf{Alternative:} full factorial design.
+  \item \textbf{Why:} each effect can be explained on its own (short vs. safe).
+\end{itemize}
+
+\subsection*{1.4 Part 2 (driving): Dijkstra with DWB and TEB}
+\begin{itemize}
+  \item \textbf{Decision:} drive Dijkstra only (A* gives almost the same paths) with two controllers, DWB and TEB, 3 repetitions each. (2026-11-10 first reduced to Dijkstra + DWB; TEB added after the progress meeting 2026-11-11.)
+  \item \textbf{Ground truth:} \pkg{gazebo\_ros\_p3d} plugin added to the robot model (\pkg{/ground\_truth/odom}, 30\,Hz).
+  \item \textbf{Deviation:} of the estimated path (controller error) and of the true path (controller + localization error); localization error reported to interpret the difference.
+\end{itemize}
+
+\subsection*{1.5 Localization check at the start -- option B (2026-11-23)}
+\begin{itemize}
+  \item \textbf{Decision:} after the drive to the start, compare AMCL with the ground truth; error > 0.10\,m or start not reached $\rightarrow$ reject the attempt, reset AMCL to the ground truth, drive to the start again (max. 3 attempts). The measured run itself is never corrected.
+  \item \textbf{Alternative (option A):} reset AMCL to the ground truth before every measured run.
+  \item \textbf{Why:} under Jazzy the robot got stuck at a pillar on the way to P2, AMCL ended up $\approx$1\,m off and the measured run started at the wrong place (video \pkg{videos/jazzy/task1a\_localization\_failure\_p2.mp4}). Option B keeps the measured run a normal run and makes such failures visible.
+  \item \textbf{Consequence:} number of rejected attempts is a result of its own (seen again in the Humble DWB video run: AMCL 4.2\,m off, caught).
+\end{itemize}
+
+\subsection*{1.6 TEB: default homotopy class planning kept -- option A (2026-11-23)}
+\begin{itemize}
+  \item \textbf{Decision:} \pkg{enable\_homotopy\_class\_planning: true} (default).
+  \item \textbf{Alternative (B):} switch it off $\rightarrow$ TEB only follows one route; smoother comparison, but not the usual TEB.
+  \item \textbf{Why:} the detour in TEB repetition 3 / P3 (robot turns into the pillar gap, oscillates $\approx$30\,s, returns) is a real property: TEB may leave the global path, DWB cannot. Visible in the TEB video (local plan loops between the pillars).
+\end{itemize}
+
+\subsection*{1.7 Further settings in Part 2}
+\begin{itemize}
+  \item \pkg{yaw\_goal\_tolerance} disabled (6.29\,rad): with plan-once, rotating at the goal left DWB with an empty plan and the goal was aborted.
+  \item \pkg{xy\_goal\_tolerance} 0.25\,m kept $\rightarrow$ start/end differ from the pair coordinates by up to 0.25\,m.
+  \item Camera removed from the robot model (CPU load under WSL2).
+  \item \textbf{(technical)} TEB bug fixed (\pkg{setup/teb\_plan\_transform.patch}): the ROS 2 port looked up map $\rightarrow$ odom at the time stamp of the plan; with plan-once every run longer than 10\,s failed.
+  \item \textbf{(technical)} \pkg{use\_sim\_time} in every section of \pkg{nav2\_params.yaml} (Humble bringup only rewrites existing keys).
+\end{itemize}
+
+\subsection*{1.8 TEB speed (open, kept for now)}
+\begin{itemize}
+  \item TEB drives $\approx$0.20\,m/s, DWB $\approx$0.27\,m/s, both with \pkg{max\_vel\_x} 0.3: \pkg{penalty\_epsilon} 0.1 (TEB example configuration) makes TEB's velocity penalty start at 0.2\,m/s.
+  \item \textbf{Status:} kept as is (``1a is fine for now''); must be stated in the report. Alternative: tune TEB to the same effective speed and rerun TEB ($\approx$10\,min). Question for the TA in the presentation.
+\end{itemize}
+
+\subsection*{1.9 Videos (2026-11-23)}
+\begin{itemize}
+  \item \textbf{Decision:} re-record under Humble: one video DWB, one TEB (P1--P3, RViz, 2x speed), with a label for every section (``drive to the start \ldots{} (not measured)'' / ``measured run \ldots{}'') and a legend (planned, estimated, true path, local plan).
+  \item \textbf{Why:} the old videos did not show which drives were measured (6 drives per video).
+  \item Old Jazzy videos kept in \pkg{videos/jazzy/}; the localization-failure video can be shown as the reason for the localization check.
+\end{itemize}
+
+\subsection*{1.10 Clearance metric along the segments (technical, 2026-11-23)}
+\begin{itemize}
+  \item Clearance was evaluated only at the path poses; now also on points of segments longer than a cell diagonal. Checked: all 1a values unchanged (NavFn has one pose per cell); needed for RRT.
+\end{itemize}
+
+\section{Task 1b -- RRT global planner plugin}
+
+\subsection*{2.1 Who writes the code}
+\begin{itemize}
+  \item \textbf{Decision:} first ``together step by step'', then (2026-11-23) Claude writes all five functions and the extensions, we read and check them, declared in the DUIA.
+\end{itemize}
+
+\subsection*{2.2 Where the code lives}
+\begin{itemize}
+  \item \textbf{Decision:} copy of the skeleton in \pkg{mp2/rrt\_planner} (in our repo), linked into \pkg{\textasciitilde{}/ros2\_ws/src}.
+  \item \textbf{Alternatives:} fork of the skeleton repo; leave it in the cloned skeleton (not versioned).
+  \item \textbf{Why:} versioned with everything else, Pascal gets it with the repo.
+  \item \textbf{(technical)} \pkg{mp2/COLCON\_IGNORE}: the Jazzy workspace builds \pkg{mp1} from the same repo and would otherwise try to build the Humble plugin.
+  \item READMEs describe our planner, without the skeleton/student instructions.
+\end{itemize}
+
+\subsection*{2.3 Algorithm scope: RRT + goal bias + shortcut smoothing}
+\begin{itemize}
+  \item \textbf{Decision:} the required RRT plus two switchable extensions: goal bias (fraction of samples = goal) and shortcut smoothing of the finished path. Both off in the baseline.
+  \item \textbf{Alternatives:} plain RRT only; additionally RRT*.
+  \item \textbf{Why:} the effect of each extension can be measured against the required RRT.
+\end{itemize}
+
+\subsection*{2.4 Collision check: cost threshold as a parameter}
+\begin{itemize}
+  \item \textbf{Decision:} a cell is free if its cost < \pkg{rrt.cost\_threshold} (baseline 253 = inscribed: the robot circle does not touch an obstacle); unknown cells (255) and points outside the costmap are never free; only the robot centre is checked (robot radius is in the inflation layer).
+  \item \textbf{Alternatives:} fixed ``< 253''; only cost 0 (impossible: P1 lies $\approx$0.4\,m from the pillars).
+  \item \textbf{Consequence:} threshold 128 $\rightarrow$ robot centre > 0.29\,m from obstacles.
+  \item For Task 2: \pkg{robot\_radius} in the costmap must fit the real robot ($\approx$0.21\,m instead of 0.15\,m).
+\end{itemize}
+
+\subsection*{2.5 Sampling range: whole costmap}
+\begin{itemize}
+  \item \textbf{Decision:} uniform in the whole costmap (origin to origin + size, 19.2 $\times$ 19.2\,m).
+  \item \textbf{Alternatives:} bounding box of the free space (recommended at the time); keep the skeleton ($\pm$map size around (0, 0)).
+  \item \textbf{Consequence:} the free hexagon is only 5.4 \% of the map $\rightarrow$ $\approx$90 \% of the iterations add no node, 14--22 \% of the plans fail after 5000 iterations. A result to discuss in the report.
+\end{itemize}
+
+\subsection*{2.6 Path end: goal appended if free}
+\begin{itemize}
+  \item \textbf{Decision:} if the segment from the last node to the goal is free, the goal is appended.
+  \item \textbf{Alternative:} skeleton (path ends up to 0.2\,m before the goal).
+  \item \textbf{Why:} path ends exactly at the goal like Dijkstra $\rightarrow$ lengths comparable.
+\end{itemize}
+
+\subsection*{2.7 Random numbers: seed parameter}
+\begin{itemize}
+  \item \textbf{Decision:} one generator per planner, seeded once with \pkg{rrt.seed} (experiments: seed 1); 0 = random.
+  \item \textbf{Alternative:} skeleton (new random seed for every number, not reproducible).
+  \item \textbf{Consequence:} reproducible: a second run of the whole experiment gave identical paths for all 750 plans.
+\end{itemize}
+
+\subsection*{2.8 Experiment design (planning, no Gazebo)}
+\begin{itemize}
+  \item \textbf{Baseline} = plain RRT as in the skeleton: step 0.2\,m, goal bias 0, threshold 253, no smoothing.
+  \item \textbf{Variants}, one parameter at a time, at most 2 values per parameter: step 0.5\,m; goal bias 0.1; threshold 128; smoothing on.
+  \item \textbf{50 plans} per pair and configuration (750 in total).
+  \item \textbf{Metrics:} length, planning time, min. clearance + success rate + iterations/tree nodes.
+  \item \textbf{Reference:} Dijkstra from Task 1a.
+\end{itemize}
+
+\subsection*{2.9 Driving (Gazebo): RRT + DWB}
+\begin{itemize}
+  \item \textbf{Decision:} RRT + DWB (no TEB), 3 repetitions per variant: baseline and smoothed (2026-11-23), plus threshold 128 after the first run showed many replans (``only threshold 128'', not combined with smoothing, so only one parameter changes).
+  \item \textbf{Comparison:} Dijkstra + DWB from Task 1a.
+  \item \textbf{(technical)} \pkg{sim.launch.py planner:=rrt} uses a copy of the plan-once tree with \pkg{planner\_id="RRT"}.
+\end{itemize}
+
+\subsection*{2.10 Evaluation with replanning: against the active plan}
+\begin{itemize}
+  \item \textbf{Decision:} deviation of each sample against the plan that was active at that time; number of plans per run reported as a metric.
+  \item \textbf{Alternatives:} only runs without replanning (none left for P3); against the first plan (measures route changes, up to 3\,m).
+  \item \textbf{Why:} with RRT a replan returns a different random route; only the active plan measures path following.
+  \item \textbf{Consequence:} with one plan the result is the same as before (1a values unchanged).
+\end{itemize}
+
+\subsection*{2.11 Costmap lock}
+\begin{itemize}
+  \item \textbf{Decision:} the costmap is locked during planning and smoothing (\pkg{getMutex}).
+  \item \textbf{Why:} in the full simulation the costmap is updated continuously; no relevant drawback (planning takes milliseconds).
+\end{itemize}
+
+\subsection*{2.12 Technical choices in the plugin}
+\begin{itemize}
+  \item Sampling range and costmap origin/resolution read before every plan (the costmap gets its final size only when the map arrives).
+  \item Plugin publishes on \pkg{rrt/plan} instead of \pkg{plan} (the planner server already publishes \pkg{/plan}; every path arrived twice) and \pkg{rrt/stats} (success, iterations, nodes, poses) for the metrics.
+  \item Nearest node: linear search; extension: one step of \pkg{step} towards the sample (or the sample itself if closer).
+  \item Smoothing: greedy shortcutting, then the straight segments are resampled at the costmap resolution (5\,cm); without it DWB had no pose inside its 3 $\times$ 3\,m local costmap on long segments.
+\end{itemize}
+
+\section{Task 2 -- Real robot (not started)}
+
+Decisions still to take:
+\begin{itemize}
+  \item TurtleBot3 Waffle Pi or TurtleBot4 (proposal: Waffle Pi, map and AMCL parameters from MP1).
+  \item \pkg{robot\_radius} $\approx$0.21\,m (or footprint polygon) for the real robot.
+  \item 2a: waypoints (4, as in Figure 1 of the assignment), planner (Dijkstra and/or RRT), controller.
+  \item 2b: grid size (4$\times$4 or 5$\times$5), states/actions/rewards, marker for waypoint 3, number of episodes, learning rate / discount / exploration.
+\end{itemize}
+
+\section{Open points to remember for the report}
+
+\begin{itemize}
+  \item Why A* is not faster than Dijkstra in NavFn (1a).
+  \item DWB cuts the corner at the start of P3 (20--28\,cm): check the critic weights (1a).
+  \item TEB speed / \pkg{penalty\_epsilon} (1.8): state in the report or rerun.
+  \item Replanning cause in 1b: most likely the path became invalid in the live costmap (not logged by Nav2) -- state as the most likely explanation, with the evidence (none with threshold 128).
+  \item Video for 1b (RRT + DWB, possibly with the RRT tree in RViz); presentation not updated for 1b.
+  \item DUIA: list where AI was used (code of 1b, scripts, analysis, text).
+\end{itemize}
+
+\end{document}

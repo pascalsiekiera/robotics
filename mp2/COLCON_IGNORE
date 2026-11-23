@@ -1,0 +1,3 @@
+# The Humble workspace links mp2/rrt_planner directly (~/ros2_ws/src/rrt_planner -> .../mp2/rrt_planner).
+# This file keeps colcon in the Jazzy workspace (which builds mp1 from this repo) out of mp2:
+# rrt_planner uses the Humble nav2_core interface and does not build under Jazzy.

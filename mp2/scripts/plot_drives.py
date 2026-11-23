@@ -65,11 +65,18 @@ def main():
                 planned = np.array(run['planned'])
                 gt = np.array(run['ground_truth'])
                 ax.plot(planned[:, 0], planned[:, 1], '-', color='tab:blue', lw=2.2, label='planned')
+                # later plans (replanning, Task 1b), if stored
+                for k, plan in enumerate(run.get('plans', [])[1:]):
+                    xy = np.array(plan['path'])
+                    ax.plot(xy[:, 0], xy[:, 1], '-', color='tab:purple', lw=1.2, alpha=0.6,
+                            label=f'later plans ({len(run["plans"]) - 1})' if k == 0 else None)
                 est = np.array(run['estimated'])
                 ax.plot(est[:, 1], est[:, 2], ':', color='tab:green', lw=1.8, label='driven (estimated)')
                 ax.plot(gt[:, 1], gt[:, 2], '--', color='tab:red', lw=1.6, label='driven (ground truth)')
                 ax.set_title(f'{pair_name} ({tag}): deviation est {run["deviation_est_mean_m"] * 100:.1f} cm, '
-                             f'true {run["deviation_true_mean_m"] * 100:.1f} cm (mean)', fontsize=8)
+                             f'true {run["deviation_true_mean_m"] * 100:.1f} cm (mean)'
+                             + (f', {run["n_plans"]} plans' if run.get('n_plans', 1) > 1 else ''),
+                             fontsize=8)
             else:
                 ax.set_title(f'{pair_name} ({tag}): no data', fontsize=8)
             ax.plot(*pair['start'], 'ko', ms=6)

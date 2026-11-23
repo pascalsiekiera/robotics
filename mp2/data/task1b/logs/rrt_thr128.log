@@ -1,0 +1,385 @@
+[INFO] [launch]: All log files can be found below /home/kiama/.ros/log/2026-11-23-16-30-57-003392-matchalaptop-5969
+[INFO] [launch]: Default logging verbosity is set to INFO
+[planning_only] RRT: goal_tolerance 0.2, rrt.step 0.2, rrt.min_num_nodes 200, rrt.max_num_nodes 5000, rrt.goal_bias 0.0, rrt.cost_threshold 128, rrt.smoothing False, rrt.seed 1
+[planning_only] global costmap: robot_radius 0.15, inflation_radius 0.5, cost_scaling_factor 5.0
+[INFO] [map_server-1]: process started with pid [5973]
+[INFO] [planner_server-2]: process started with pid [5975]
+[INFO] [static_transform_publisher-3]: process started with pid [5977]
+[INFO] [lifecycle_manager-4]: process started with pid [5979]
+[static_transform_publisher-3] [INFO] [1795451457.282210495] [static_transform_publisher_rCRnDevMZOyUQnm6]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('-2.000000', '-0.500000', '0.000000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'map' to 'base_link'
+[lifecycle_manager-4] [INFO] [1795451457.294405402] [lifecycle_manager_planning]: Creating
+[lifecycle_manager-4] [INFO] [1795451457.297953411] [lifecycle_manager_planning]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[planner_server-2] [INFO] [1795451457.306121329] [planner_server]: 
+[planner_server-2] 	planner_server lifecycle node launched. 
+[planner_server-2] 	Waiting on external lifecycle transitions to activate
+[planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[lifecycle_manager-4] [INFO] [1795451457.318568617] [lifecycle_manager_planning]: [34m[1mStarting managed nodes bringup...[0m[0m
+[lifecycle_manager-4] [INFO] [1795451457.318633289] [lifecycle_manager_planning]: [34m[1mConfiguring map_server[0m[0m
+[map_server-1] [INFO] [1795451457.319730813] [map_server]: 
+[map_server-1] 	map_server lifecycle node launched. 
+[map_server-1] 	Waiting on external lifecycle transitions to activate
+[map_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[map_server-1] [INFO] [1795451457.319946381] [map_server]: Creating
+[map_server-1] [INFO] [1795451457.320693685] [map_server]: Configuring
+[map_server-1] [INFO] [1795451457.320758916] [map_io]: Loading yaml file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.yaml
+[map_server-1] [INFO] [1795451457.321128070] [map_io]: resolution: 0.05
+[map_server-1] [INFO] [1795451457.321143219] [map_io]: origin[0]: -10
+[map_server-1] [INFO] [1795451457.321149379] [map_io]: origin[1]: -10
+[map_server-1] [INFO] [1795451457.321155237] [map_io]: origin[2]: 0
+[map_server-1] [INFO] [1795451457.321161676] [map_io]: free_thresh: 0.196
+[map_server-1] [INFO] [1795451457.321167684] [map_io]: occupied_thresh: 0.65
+[map_server-1] [INFO] [1795451457.321174859] [map_io]: mode: trinary
+[map_server-1] [INFO] [1795451457.321182134] [map_io]: negate: 0
+[map_server-1] [INFO] [1795451457.321449574] [map_io]: Loading image_file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm
+[map_server-1] [INFO] [1795451457.337406685] [map_io]: Read map /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm: 384 X 384 map @ 0.05 m/cell
+[lifecycle_manager-4] [INFO] [1795451457.345075185] [lifecycle_manager_planning]: [34m[1mConfiguring planner_server[0m[0m
+[planner_server-2] [INFO] [1795451457.359663813] [planner_server]: Creating
+[planner_server-2] [INFO] [1795451457.371549966] [global_costmap.global_costmap]: 
+[planner_server-2] 	global_costmap lifecycle node launched. 
+[planner_server-2] 	Waiting on external lifecycle transitions to activate
+[planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[planner_server-2] [INFO] [1795451457.372125056] [global_costmap.global_costmap]: Creating Costmap
+[planner_server-2] [INFO] [1795451457.375662675] [planner_server]: Configuring
+[planner_server-2] [INFO] [1795451457.375701190] [global_costmap.global_costmap]: Configuring
+[planner_server-2] [INFO] [1795451457.381272692] [global_costmap.global_costmap]: Using plugin "static_layer"
+[planner_server-2] [INFO] [1795451457.386123017] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
+[planner_server-2] [INFO] [1795451457.388009504] [global_costmap.global_costmap]: Initialized plugin "static_layer"
+[planner_server-2] [INFO] [1795451457.388086963] [global_costmap.global_costmap]: Using plugin "inflation_layer"
+[planner_server-2] [INFO] [1795451457.389224491] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
+[planner_server-2] [INFO] [1795451457.407057377] [planner_server]: Created global planner plugin GridBased of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795451457.407153509] [planner_server]: Configuring plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451457.408250047] [planner_server]: Created global planner plugin AStar of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795451457.408289707] [planner_server]: Configuring plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451457.411052386] [planner_server]: Created global planner plugin RRT of type rrt_planner/RRTPlannerROS
+[planner_server-2] [INFO] [1795451457.417034888] [planner_server]: [RRTPlannerROS] Configured with goal_tolerance=0.20, step=0.20, min_nodes=200, max_nodes=5000, goal_bias=0.00, cost_threshold=128, smoothing=0, seed=1
+[planner_server-2] [INFO] [1795451457.417120552] [planner_server]: Planner Server has GridBased AStar RRT  planners available.
+[lifecycle_manager-4] [INFO] [1795451457.427232400] [lifecycle_manager_planning]: [34m[1mActivating map_server[0m[0m
+[map_server-1] [INFO] [1795451457.427504067] [map_server]: Activating
+[map_server-1] [INFO] [1795451457.427864580] [map_server]: Creating bond (map_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451457.428398030] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 384 X 384 at 0.050000 m/pix
+[lifecycle_manager-4] [INFO] [1795451457.533690952] [lifecycle_manager_planning]: Server map_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795451457.533877564] [lifecycle_manager_planning]: [34m[1mActivating planner_server[0m[0m
+[planner_server-2] [INFO] [1795451457.534502250] [planner_server]: Activating
+[planner_server-2] [INFO] [1795451457.534602404] [global_costmap.global_costmap]: Activating
+[planner_server-2] [INFO] [1795451457.534631126] [global_costmap.global_costmap]: Checking transform
+[planner_server-2] [INFO] [1795451457.535073261] [global_costmap.global_costmap]: start
+[planner_server-2] [INFO] [1795451457.585651126] [planner_server]: Activating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451457.585810366] [planner_server]: Activating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451457.588101547] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[lifecycle_manager-4] [INFO] [1795451457.698282399] [lifecycle_manager_planning]: Server planner_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795451457.698436169] [lifecycle_manager_planning]: [34m[1mManaged nodes are active[0m[0m
+[lifecycle_manager-4] [INFO] [1795451457.698467015] [lifecycle_manager_planning]: [34m[1mCreating bond timer...[0m[0m
+[planner_server-2] [INFO] [1795451461.959113829] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451461.995226199] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451461.995692168] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451461.995734671] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.000609931] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.014941648] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.021969973] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.026952881] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.059241704] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.059557961] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.059602884] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.064416422] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.092751231] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.092952950] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.092989589] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.099023079] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.118780413] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.125715265] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.133406221] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.161838025] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.161999127] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.162027737] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.166934195] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.187351033] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.192321764] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.198605526] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.216887912] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.217061995] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.217090960] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.221997796] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.228551595] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.250865602] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.263892663] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.284847666] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.285036292] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.285069359] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.291796605] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.310181178] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.310377210] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.310400553] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.315403381] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.323267529] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.340836506] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.341080573] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.341112004] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.347774445] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.370086877] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.370310464] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.370339784] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.376389815] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.392436080] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.419525641] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.419803124] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.419840439] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.426434219] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.433715678] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.454288265] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.454423508] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.454444747] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.458967164] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.481337118] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.481573276] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.481609888] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.487112724] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.493543186] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.504987903] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.513371184] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.519754834] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.525967393] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.535796022] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.553866773] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.554014495] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.554080198] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.560035045] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.569664754] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.588763347] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.598827648] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.618440384] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.637893132] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.638042541] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.638062808] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.643764513] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.667862223] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.673934448] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.696392534] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.696606212] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.696637287] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.705069847] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.720868111] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.754726931] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.754901080] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.754925983] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.761269017] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.771845327] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.809019866] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.809286926] [planner_server]: Planning algorithm RRT failed to generate a valid path to (0.55, -0.55)
+[planner_server-2] [WARN] [1795451462.809350503] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.818425848] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.829868131] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.848924562] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.856866176] [planner_server]: [RRTPlannerROS] Planning from (-0.55, -0.55) to (0.55, -0.55)
+[planner_server-2] [INFO] [1795451462.874680257] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.882881356] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.890594041] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451462.911694103] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451462.911847274] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451462.911868389] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451462.917599470] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.925028557] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.936325939] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.943898242] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.958446081] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451462.980750198] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.012940246] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.013180739] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.013211766] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.021103328] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.044378847] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.044537105] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.044565600] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.050711824] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.069008834] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.077067258] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.084347487] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.108793100] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.132050816] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.132271141] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.132305075] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.139413845] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.164323467] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.164485288] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.164514087] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.169928443] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.178554825] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.197802921] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.197933732] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.197954179] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.203684452] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.222223323] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.222380737] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.222407175] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.229329450] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.238242424] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.255655640] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.255819862] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.255841372] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.261391327] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.281481280] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.281626740] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.281691896] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.288545915] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.304166327] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.312781022] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.336156820] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.368072890] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.387285762] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.387437275] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.387472544] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.392867741] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.404039224] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.425018977] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.425240048] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.425299586] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.431359739] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.441025255] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.460667386] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.460848838] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.460879134] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.468221447] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.485832714] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.503911184] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.504058804] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.504082414] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.511990668] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.535215144] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.545054958] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.563880688] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.564028640] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.564054697] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.570058494] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.590802452] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.615737793] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.615948378] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.615982712] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.625347552] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.640617838] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.654379421] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.677411898] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.685727184] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.713771592] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.741099005] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.752343138] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.781652036] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.781902525] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.781928885] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.790440009] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.820533852] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451463.820748907] [planner_server]: Planning algorithm RRT failed to generate a valid path to (-1.60, 1.60)
+[planner_server-2] [WARN] [1795451463.820782006] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451463.828780622] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.842831067] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.864164710] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (-1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.879789586] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.892937997] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.908087067] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.924088240] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.940815061] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451463.981233651] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.009217411] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.009385194] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.009409509] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.015986421] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.031009404] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.050760291] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.068852780] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.099547065] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.119748487] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.137161439] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.157130224] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.177664770] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.177831586] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.177855987] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.186283366] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.198242745] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.231583298] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.268647405] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.268856437] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.268890342] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.278495362] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.299322558] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.319694587] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.339214684] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.357432991] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.367882652] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.378158552] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.393046725] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.413828824] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.413978438] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.414001896] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.420960322] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.433197358] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.453098747] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.471996878] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.472168958] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.472194157] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.480019552] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.507325047] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.559790678] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.591632220] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.617258323] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.656952196] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.657209299] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.657245267] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.665855013] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.684832470] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.709765647] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.709906989] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.709931244] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.717276630] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.730177162] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.747199200] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.760531270] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.773733402] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.800095168] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451464.800291249] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451464.800316235] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[planner_server-2] [INFO] [1795451464.811131135] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.829943370] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.849373717] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.870192847] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.899886475] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.939239454] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.960270246] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.973619562] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451464.994142338] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [INFO] [1795451465.033076617] [planner_server]: [RRTPlannerROS] Planning from (-1.60, -1.60) to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451465.065871001] [planner_server]: [RRTPlannerROS] Failed to find a path.
+[planner_server-2] [WARN] [1795451465.066204231] [planner_server]: Planning algorithm RRT failed to generate a valid path to (1.60, 1.60)
+[planner_server-2] [WARN] [1795451465.066247643] [planner_server]: [compute_path_to_pose] [ActionServer] Aborting handle.
+[static_transform_publisher-3] [INFO] [1795451465.467378147] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795451465.467385433] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795451465.467660330] [lifecycle_manager_planning]: Running Nav2 LifecycleManager rcl preshutdown (lifecycle_manager_planning)
+[lifecycle_manager-4] [INFO] [1795451465.467767393] [lifecycle_manager_planning]: [34m[1mTerminating bond timer...[0m[0m
+[planner_server-2] [INFO] [1795451465.467551581] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[planner_server-2] [INFO] [1795451465.467736884] [planner_server]: Running Nav2 LifecycleNode rcl preshutdown (planner_server)
+[map_server-1] [INFO] [1795451465.467897092] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[map_server-1] [INFO] [1795451465.468103820] [map_server]: Running Nav2 LifecycleNode rcl preshutdown (map_server)
+[map_server-1] [INFO] [1795451465.468233161] [map_server]: Deactivating
+[map_server-1] [INFO] [1795451465.468269160] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451465.473315454] [planner_server]: Deactivating
+[planner_server-2] [INFO] [1795451465.473889116] [global_costmap.global_costmap]: Deactivating
+[map_server-1] [INFO] [1795451465.479620979] [map_server]: Cleaning up
+[map_server-1] [INFO] [1795451465.479844766] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[map_server-1] [INFO] [1795451465.489493704] [map_server]: Destroying
+[lifecycle_manager-4] [INFO] [1795451465.497432533] [lifecycle_manager_planning]: Destroying lifecycle_manager_planning
+[planner_server-2] [INFO] [1795451465.535763774] [planner_server]: Deactivating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.535929459] [planner_server]: Deactivating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.535972756] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451465.546824245] [planner_server]: Cleaning up
+[planner_server-2] [INFO] [1795451465.558095880] [global_costmap.global_costmap]: Cleaning up
+[planner_server-2] [INFO] [1795451465.562940047] [planner_server]: Cleaning up plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.563228771] [planner_server]: Cleaning up plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.563283345] [planner_server]: Destroying plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.563298316] [planner_server]: Destroying plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795451465.574008379] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795451465.579031129] [global_costmap.global_costmap]: Destroying
+[planner_server-2] [INFO] [1795451465.591125226] [planner_server]: Destroying
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 5977]
+[INFO] [map_server-1]: process has finished cleanly [pid 5973]
+[INFO] [lifecycle_manager-4]: process has finished cleanly [pid 5979]
+[INFO] [planner_server-2]: process has finished cleanly [pid 5975]

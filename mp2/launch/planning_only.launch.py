@@ -1,4 +1,4 @@
-"""Task 1a, part 1: global planner only, without Gazebo, AMCL and controller.
+"""Task 1a part 1 and Task 1b: global planner only, without Gazebo, AMCL and controller.
 
 Starts map_server + planner_server (+ lifecycle manager) and a static transform
 map -> base_link. The parameters are taken from mp2/config/nav2_params.yaml (same
@@ -10,8 +10,11 @@ planners and costmap settings as in the driving runs) with these changes:
 Run:
     ros2 launch mp2/launch/planning_only.launch.py
     ros2 launch mp2/launch/planning_only.launch.py inflation_radius:=0.3
+    ros2 launch mp2/launch/planning_only.launch.py rrt_goal_bias:=0.1
 Costmap parameters that can be overridden (empty = value from the params file):
     inflation_radius, cost_scaling_factor, robot_radius
+RRT parameters (planner "RRT", Task 1b) that can be overridden:
+    rrt_step, rrt_goal_bias, rrt_cost_threshold, rrt_smoothing (true/false), rrt_seed
 """
 import os
 import tempfile
@@ -46,6 +49,14 @@ def make_nodes(context):
         value = LaunchConfiguration(name).perform(context)
         if value:
             target[name] = float(value)
+    rrt = params['planner_server']['ros__parameters'].get('RRT')
+    for name, convert in (('step', float), ('goal_bias', float), ('cost_threshold', int),
+                          ('smoothing', lambda v: v.lower() == 'true'), ('seed', int)):
+        value = LaunchConfiguration('rrt_' + name).perform(context)
+        if value and rrt is not None:
+            rrt['rrt.' + name] = convert(value)
+    if rrt is not None:
+        print('[planning_only] RRT: ' + ', '.join(f'{k} {v}' for k, v in rrt.items() if k != 'plugin'))
     print('[planning_only] global costmap: robot_radius %s, inflation_radius %s, '
           'cost_scaling_factor %s' % (costmap['robot_radius'],
                                       costmap['inflation_layer']['inflation_radius'],
@@ -78,5 +89,10 @@ def generate_launch_description():
         DeclareLaunchArgument('inflation_radius', default_value=''),
         DeclareLaunchArgument('cost_scaling_factor', default_value=''),
         DeclareLaunchArgument('robot_radius', default_value=''),
+        DeclareLaunchArgument('rrt_step', default_value=''),
+        DeclareLaunchArgument('rrt_goal_bias', default_value=''),
+        DeclareLaunchArgument('rrt_cost_threshold', default_value=''),
+        DeclareLaunchArgument('rrt_smoothing', default_value=''),
+        DeclareLaunchArgument('rrt_seed', default_value=''),
         OpaqueFunction(function=make_nodes),
     ])

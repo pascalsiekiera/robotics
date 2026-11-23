@@ -12,12 +12,17 @@ overloads the CPU under WSL2 (seen with Gazebo Harmonic under Jazzy).
 Controller (controller_server plugin "FollowPath"):
     controller:=dwb  DWB as in nav2_params.yaml (default)
     controller:=teb  TEB from config/teb_controller.yaml
+Global planner used by the behavior tree (Task 1b):
+    planner:=dijkstra  "GridBased" (NavFn, default)
+    planner:=rrt       "RRT" (mp2/rrt_planner); rrt_smoothing:=true for the smoothed variant,
+                       rrt_cost_threshold:=128 for the variant with more distance to obstacles
 The Jazzy version (Gazebo Harmonic) of this file is mp2/jazzy/sim.launch.py.
 
 Run:
     ros2 launch mp2/launch/sim.launch.py                       # headless, DWB
     ros2 launch mp2/launch/sim.launch.py gui:=true rviz:=true  # with Gazebo window and RViz
     ros2 launch mp2/launch/sim.launch.py controller:=teb
+    ros2 launch mp2/launch/sim.launch.py planner:=rrt rrt_smoothing:=true
 """
 import os
 import re
@@ -69,21 +74,46 @@ def robot_model():
 
 
 def nav2(context):
-    """Nav2 bringup with the params file, FollowPath replaced by TEB if controller:=teb."""
+    """Nav2 bringup with the params file; FollowPath replaced by TEB if controller:=teb,
+    behavior tree with planner_id "RRT" if planner:=rrt."""
     params_file = LaunchConfiguration('params_file').perform(context)
     controller = LaunchConfiguration('controller').perform(context)
+    planner = LaunchConfiguration('planner').perform(context)
+    smoothing = LaunchConfiguration('rrt_smoothing').perform(context)
+    threshold = LaunchConfiguration('rrt_cost_threshold').perform(context)
+    if controller not in ('dwb', 'teb'):
+        raise RuntimeError(f'controller must be dwb or teb, not {controller!r}')
+    if planner not in ('dijkstra', 'rrt'):
+        raise RuntimeError(f'planner must be dijkstra or rrt, not {planner!r}')
+    with open(params_file) as f:
+        params = yaml.safe_load(f)
     if controller == 'teb':
-        with open(params_file) as f:
-            params = yaml.safe_load(f)
         with open(os.path.join(MP2, 'config', 'teb_controller.yaml')) as f:
             params['controller_server']['ros__parameters'].update(yaml.safe_load(f))
-        tmp = tempfile.NamedTemporaryFile('w', suffix='_nav2_teb.yaml', delete=False)
+    if planner == 'rrt':
+        # the plan-once behavior tree has planner_id="GridBased" hard-coded -> copy with "RRT"
+        bt_params = params['bt_navigator']['ros__parameters']
+        with open(bt_params['default_nav_to_pose_bt_xml']) as f:
+            bt = f.read()
+        assert 'planner_id="GridBased"' in bt, 'planner_id not found in the behavior tree'
+        bt_tmp = tempfile.NamedTemporaryFile('w', suffix='_bt_rrt.xml', delete=False)
+        bt_tmp.write(bt.replace('planner_id="GridBased"', 'planner_id="RRT"'))
+        bt_tmp.close()
+        bt_params['default_nav_to_pose_bt_xml'] = bt_tmp.name
+        rrt = params['planner_server']['ros__parameters']['RRT']
+        if smoothing:
+            rrt['rrt.smoothing'] = smoothing == 'true'
+        if threshold:
+            rrt['rrt.cost_threshold'] = int(threshold)
+    if controller != 'dwb' or planner != 'dijkstra':
+        tmp = tempfile.NamedTemporaryFile('w', suffix=f'_nav2_{controller}_{planner}.yaml', delete=False)
         yaml.safe_dump(params, tmp)
         tmp.close()
         params_file = tmp.name
-    elif controller != 'dwb':
-        raise RuntimeError(f'controller must be dwb or teb, not {controller!r}')
-    print(f'[sim] controller {controller}, params {params_file}')
+    print(f'[sim] controller {controller}, planner {planner}'
+          + (f' (smoothing {smoothing})' if planner == 'rrt' and smoothing else '')
+          + (f' (cost threshold {threshold})' if planner == 'rrt' and threshold else '')
+          + f', params {params_file}')
     return [IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(NAV2_BRINGUP, 'launch', 'bringup_launch.py')),
         launch_arguments={'map': os.path.join(TB3_NAV2, 'map', 'map.yaml'),
@@ -103,6 +133,9 @@ def generate_launch_description():
         DeclareLaunchArgument('gui', default_value='false', description='Gazebo window'),
         DeclareLaunchArgument('rviz', default_value='false'),
         DeclareLaunchArgument('controller', default_value='dwb', description='dwb or teb'),
+        DeclareLaunchArgument('planner', default_value='dijkstra', description='dijkstra or rrt'),
+        DeclareLaunchArgument('rrt_smoothing', default_value='', description='true/false (planner:=rrt)'),
+        DeclareLaunchArgument('rrt_cost_threshold', default_value='', description='e.g. 128 (planner:=rrt)'),
         DeclareLaunchArgument('params_file',
                               default_value=os.path.join(MP2, 'config', 'nav2_params.yaml')),
 

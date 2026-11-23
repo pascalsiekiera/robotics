@@ -312,7 +312,7 @@ planner_server:
   ros__parameters:
     use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     expected_planner_frequency: 10.0
-    planner_plugins: ["GridBased", "AStar"]  # MP2: AStar added
+    planner_plugins: ["GridBased", "AStar", "RRT"]  # MP2: AStar and RRT (Task 1b) added
     GridBased:  # Dijkstra
       plugin: "nav2_navfn_planner/NavfnPlanner"
       tolerance: 0.5
@@ -323,6 +323,16 @@ planner_server:
       tolerance: 0.5
       use_astar: true
       allow_unknown: true
+    RRT:  # MP2 Task 1b: own RRT (mp2/rrt_planner); baseline = plain RRT of the skeleton
+      plugin: "rrt_planner/RRTPlannerROS"
+      goal_tolerance: 0.20     # last node this close to the goal = success
+      rrt.step: 0.20           # extension step [m]
+      rrt.min_num_nodes: 200   # iterations before the goal is checked
+      rrt.max_num_nodes: 5000  # iterations before giving up
+      rrt.goal_bias: 0.0       # fraction of samples = goal (variant: 0.1)
+      rrt.cost_threshold: 253  # cell free if cost < this (253 = inscribed; variant: 128)
+      rrt.smoothing: false     # shortcut smoothing (variant: true)
+      rrt.seed: 1              # fixed seed: same request sequence -> same paths (0 = random)
 
 smoother_server:
   ros__parameters:

@@ -533,4 +533,208 @@ Observations:
         node they need (\pkg{\_waitForNodeToActivate}).
 \end{itemize}
 
+% =====================================================================
+\section{Task 1b -- RRT global planner plugin}
+
+\subsection{Goal}
+Implement an RRT algorithm and use it instead of the default global planner as a Nav2 plugin; collision checks with
+\pkg{costmap\_2d}. Skeleton: \pkg{github.com/irob-labs-ist/rrt\_planner} (\pkg{nav2\_core::GlobalPlanner},
+builds under Humble). \pkg{rrt\_exploration} may be used for testing only.
+
+\subsection{Skeleton}
+\begin{itemize}
+  \item Given: plugin interface (\pkg{configure}, \pkg{createPlan}), main loop \pkg{planPath}, line collision check
+        \pkg{obstacleBetween} (samples the segment at costmap resolution), path extraction (walk back from the last node).
+  \item To implement: \pkg{sampleRandomPoint}, \pkg{getNearestNodeId}, \pkg{extendTree}, \pkg{createNewNode}
+        (\pkg{rrt\_planner.cpp}), \pkg{inFreeSpace} (\pkg{collision\_detector.cpp}).
+  \item Parameters: \pkg{step} 0.2\,m, \pkg{goal\_tolerance} 0.2\,m, \pkg{min\_num\_nodes} 200 (iterations before the goal
+        is checked), \pkg{max\_num\_nodes} 5000.
+  \item Found in the skeleton: sampling range $\pm$ map size around $(0,0)$ ($[-19.2, 19.2]^2$\,m, but the map covers
+        $[-10, 9.2]^2$\,m, the free hexagon $\approx 5$\,m wide); path ends at the last node (up to 0.2\,m before the goal);
+        random generator re-seeded from \pkg{random\_device} for every number (not reproducible); \pkg{robot\_radius\_} in
+        \pkg{CollisionDetector} unused; no smoothing (zig-zag of 0.2\,m segments).
+\end{itemize}
+
+\subsection{Design decisions (2026-11-23)}
+\begin{itemize}
+  \item \textbf{Code:} copy of the skeleton in \pkg{mp2/rrt\_planner} (versioned with the project), linked into
+        \pkg{\textasciitilde/ros2\_ws/src}. The five functions are written together step by step (to be declared in the DUIA).
+        Scaffold done (2026-11-23): parameters below, seedable generator, sampling range from the costmap read
+        before every plan, \pkg{cost\_threshold} in the collision detector, path on \pkg{rrt/plan} (the planner server
+        already publishes \pkg{/plan}; the skeleton's own publisher on \pkg{plan} sent every path twice),
+        \pkg{rrt/stats} = [success, iterations, nodes, path poses]. Smoke test: plugin loads, Dijkstra unchanged,
+        RRT with placeholder functions fails cleanly after 5000 iterations. \pkg{mp2/COLCON\_IGNORE} keeps the Jazzy
+        workspace (builds \pkg{mp1} from the same repo) out of \pkg{mp2}.
+  \item \textbf{Algorithm:} RRT as required, plus two switchable extensions: \textbf{goal bias} (fraction of samples
+        = goal) and \textbf{shortcut smoothing} of the finished path. Both off in the baseline.
+  \item \textbf{Sampling:} uniform in the whole costmap (origin to origin + size).
+  \item \textbf{Collision:} a cell is free if its cost is below a parameter \pkg{cost\_threshold} (baseline 253 =
+        inscribed: robot circle does not touch an obstacle; unknown cells (255) are never free).
+  \item \textbf{Goal:} if the segment from the last node to the goal is free, the goal is appended (path ends exactly at
+        the goal, lengths comparable with Dijkstra).
+  \item \textbf{Random numbers:} one generator per planner with parameter \pkg{seed} (fixed seed $\Rightarrow$
+        reproducible, 0 $\Rightarrow$ random).
+\end{itemize}
+
+\subsection{Implementation (2026-11-23)}
+Code written by Claude (AI) at our request, read and checked by us $\Rightarrow$ declare in the DUIA.
+\begin{itemize}
+  \item \pkg{inFreeSpace}: world $\rightarrow$ cell (\pkg{worldToMap}, outside the costmap $\Rightarrow$ not free),
+        free if cost $<$ \pkg{cost\_threshold}; unknown (255) never free. Only the robot centre is checked: the
+        robot radius is in the inflation layer (as for NavFn).
+  \item \pkg{sampleRandomPoint}: with probability \pkg{goal\_bias} the goal, otherwise uniform in the costmap.
+  \item \pkg{getNearestNodeId}: linear search (Euclidean distance) over all nodes.
+  \item \pkg{extendTree}: one step of length \pkg{step} towards the sample, or the sample itself if closer.
+  \item \pkg{createNewNode}: node id = index in the node list.
+  \item Goal appended if the segment from the last node is free. Smoothing: greedy shortcutting (from the current
+        pose jump to the farthest later pose with a free straight segment), start and goal pose kept.
+  \item Costmap locked (\pkg{getMutex}) during planning and smoothing.
+\end{itemize}
+First test (planning-only, 5 plans per pair and configuration, not the experiment): all configurations find paths;
+baseline 14/15; failures after 5000 iterations with only $\approx$\,200--280 nodes, i.e.\ $\approx 95\,\%$ of the
+iterations are rejected: most samples lie outside the hexagon (sampling in the whole 19.2\,m map), the extension
+then runs into a wall. Goal bias 0.1: all found after $\approx 200$--300 iterations (the minimum is 200).
+\pkg{cost\_threshold} 128: clearance 0.29--0.30\,m (expected $> 0.285$\,m), but 7/15 failed. Smoothing: P1/P2 become
+the straight line (1.10 / 3.20\,m, 2 poses). Same seed $\Rightarrow$ base and smoothing variant have identical trees
+(reproducibility confirmed).
+
+\textbf{Metric fix:} the minimum clearance was evaluated only at the poses of the path. Fine for NavFn (one pose
+per cell), but RRT paths have poses every 0.2\,m and smoothed paths only a few (P1 smoothed: 0.57\,m reported,
+0.35\,m along the segment). \pkg{metrics.min\_clearance} now also checks points on segments longer than a cell
+diagonal (0.075\,m). Checked: on the saved 1a paths all values are unchanged.
+
+\subsection{Planned experiments}
+\begin{itemize}
+  \item Same pairs P1--P3, planning-only setup and plan-once behavior tree as in 1a; RRT is added as a third planner
+        plugin (\pkg{RRT}) next to \pkg{GridBased} and \pkg{AStar}.
+  \item \textbf{Baseline} = skeleton RRT: step 0.2\,m, goal bias 0, \pkg{cost\_threshold} 253, no smoothing.
+        \textbf{Variants} (one change at a time, 2 values per parameter): step 0.5\,m; goal bias 10\,\%;
+        \pkg{cost\_threshold} 128 (centre $> 0.29$\,m from obstacles instead of $> 0.15$\,m); smoothing on.
+  \item 50 plans per pair and configuration.
+  \item Metrics: path length, planning time, min.\ clearance (as 1a) + \textbf{success rate} + \textbf{number of
+        nodes / iterations}; comparison with Dijkstra (1a).
+  \item Driving: RRT + DWB in Gazebo, 3 repetitions, compared with Dijkstra + DWB; video. Variants driven: baseline,
+        smoothing, and (decision after the first run) \pkg{cost\_threshold} 128. Deviation against the plan that was
+        active at each moment, number of plans per run as metric (decision after the first run, see below).
+\end{itemize}
+
+\subsection{Results: planner comparison (no Gazebo)}
+50 plans per pair and configuration, seed 1 (\pkg{mp2/scripts/run\_rrt\_experiments.sh}, \pkg{plot\_rrt.py};
+data \pkg{mp2/data/task1b/plans\_rrt\_*.json}; figures \pkg{rrt\_summary.png}, \pkg{rrt\_paths\_<config>.png}).
+Length and clearance: mean over the successful plans; iterations: median over all plans (failed plans run to 5000).
+
+\begin{tabular}{llccccc}
+\toprule
+Pair & Configuration & found & length [m] mean $\pm$ sd & time [ms] median & clearance [m] mean (min) & iterations median \\
+\midrule
+P1 & Dijkstra      &       & 1.11            &     & 0.35        &      \\
+    & RRT baseline & 39/50 & $1.72 \pm 0.56$ & 5.9 & 0.21 (0.16) & 1926 \\
+    & step 0.5\,m & 35/50 & $2.96 \pm 1.93$ & 3.6 & 0.21 (0.16) & 2844 \\
+    & goal bias 0.1 & 50/50 & $1.64 \pm 1.18$ & 1.0 & 0.24 (0.16) & 208  \\
+    & threshold 128 & 33/50 & $1.73 \pm 0.79$ & 3.6 & 0.31 (0.30) & 2436 \\
+    & smoothing & 39/50 & $1.10 \pm 0.00$ & 5.6 & 0.35 (0.35) & 1926 \\
+P2 & Dijkstra      &       & 3.29            &     & 0.32        &      \\
+    & RRT baseline & 43/50 & $4.49 \pm 1.16$ & 3.5 & 0.17 (0.16) & 1580 \\
+    & step 0.5\,m & 40/50 & $4.70 \pm 1.48$ & 4.4 & 0.18 (0.14) & 2521 \\
+    & goal bias 0.1 & 50/50 & $4.09 \pm 1.13$ & 0.8 & 0.20 (0.16) & 209  \\
+    & threshold 128 & 33/50 & $4.47 \pm 1.54$ & 3.3 & 0.31 (0.30) & 3110 \\
+    & smoothing & 43/50 & $3.20 \pm 0.00$ & 5.0 & 0.34 (0.34) & 1580 \\
+P3 & Dijkstra      &       & 6.40            &     & 0.34        &      \\
+    & RRT baseline & 42/50 & $7.31 \pm 0.92$ & 4.8 & 0.17 (0.16) & 1452 \\
+    & step 0.5\,m & 39/50 & $7.34 \pm 0.78$ & 3.8 & 0.17 (0.14) & 2082 \\
+    & goal bias 0.1 & 50/50 & $6.77 \pm 0.95$ & 1.1 & 0.17 (0.16) & 220  \\
+    & threshold 128 & 41/50 & $7.60 \pm 0.46$ & 4.4 & 0.30 (0.30) & 1509 \\
+    & smoothing & 42/50 & $5.93 \pm 0.54$ & 5.0 & 0.19 (0.14) & 1452 \\
+\bottomrule
+\end{tabular}
+
+Observations:
+\begin{itemize}
+  \item \textbf{Plain RRT fails in 14--22\,\% of the plans} (5000 iterations). Only $\approx 8$--10\,\% of the iterations
+        add a node (e.g.\ P1: 1926 iterations, 164 nodes): samples are drawn in the whole 19.2\,m map, the free hexagon
+        is only 5.4\,\% of it (19.8\,m$^2$ of 369\,m$^2$), so most extensions point outwards and hit a wall. The tree grows slowly and
+        mostly along the walls.
+  \item \textbf{Paths are longer than Dijkstra} (P1 +55\,\%, P2 +36\,\%, P3 +14\,\%) and differ from plan to plan (sd up
+        to 1.2\,m; P2 max 11.4\,m: a detour through the pillar field). RRT only looks for \emph{a} free path, not the
+        cheapest; Dijkstra is optimal with respect to its cost (deterministic, sd 0).
+  \item \textbf{Clearance}: plain RRT ignores the inflation cost below the threshold, so its paths pass the obstacles at
+        the minimum allowed distance (0.16\,m = robot radius 0.15\,m + one cell), Dijkstra keeps 0.32--0.35\,m.
+        P3: RRT also goes \emph{through} the pillar field, which Dijkstra avoids (cost of the gaps, see 1a).
+        Values of 0.14\,m ($<$ 0.15\,m): discretization (our clearance uses the distance between cell centres of the
+        static map, the costmap marks whole cells), not a collision.
+  \item \textbf{Goal bias 0.1}: 100\,\% success, ends after $\approx 210$ iterations (minimum is 200), 1\,ms, slightly
+        shorter paths. Strongest effect of all variants in this open world; in a world with a wall between start and goal
+        a goal bias can make the tree get stuck at the wall.
+  \item \textbf{Step 0.5\,m}: lower success and longer, more irregular paths (P1 2.96\,m mean, up to 9.2\,m): a longer step
+        hits obstacles more often and passes the 0.4\,m goal region (tolerance 0.2\,m) more easily.
+  \item \textbf{Threshold 128}: clearance 0.30\,m as designed ($> 0.285$\,m), but lower success (66\,\% for P1/P2): the free
+        space shrinks, the gap between the pillar rows (P1) and between wall and pillars (P2) gets narrow.
+  \item \textbf{Smoothing}: same trees as the baseline (same seed), only the path is shortened: P1/P2 become the straight
+        line (1.10 / 3.20\,m, \emph{shorter} than Dijkstra, clearance 0.35 / 0.34\,m), P3 5.93\,m (Dijkstra 6.40\,m) with
+        straight segments through the pillar field. Success rate unchanged (smoothing does not help to find a path).
+  \item Planning time 1--6\,ms (median), roughly proportional to the iterations; all fast compared with the controller rate.
+  \item \textbf{Reproducibility checked}: the whole experiment run a second time gave identical paths for all
+        750 plans (smoothing: identical geometry; the second run already had the resampling below).
+  \item Smoothing output is resampled at the costmap resolution (5\,cm): DWB only uses the part of the path inside
+        its local costmap ($3\times3$\,m); a smoothed P2 path consists of start and goal only and would leave it
+        without poses (``Resulting plan has 0 poses'', as in 1a). Same geometry and length, more poses.
+\end{itemize}
+
+\subsection{Results: driving (Gazebo)}
+RRT + DWB: baseline, smoothing, cost threshold 128; 3 repetitions each (\pkg{sim.launch.py planner:=rrt
+[rrt\_smoothing:=true | rrt\_cost\_threshold:=128]}, behavior tree copy with \pkg{planner\_id="RRT"}); data
+\pkg{mp2/data/task1b/drives\_rrt\_\{,smooth\_,thr128\_\}dwb\{,\_r2,\_r3\}.json}, figures
+\pkg{drives\_rrt\_\{,smooth\_,thr128\_\}dwb\_all.png}. 27/27 goals reached; 4 rejected starts (2 localization, 2 start
+not reached). Dijkstra + DWB from Task 1a. Deviation against the plan active at each moment.
+
+\begin{tabular}{llcccccc}
+\toprule
+Pair & Planner & plans per run & 1st plan [m] & driven [m] & time [s] & dev.\ true [cm] mean (max) & loc.\ err.\ [cm] \\
+\midrule
+P1 & Dijkstra      & 1, 1, 1 & 1.18 & 0.96 & 4.4  & 4.3 (12)  & 3.7 \\
+   & RRT           & 1, 2, 1 & 1.51 & 0.93 & 7.9  & 5.0 (16)  & 2.5 \\
+   & RRT smooth    & 1, 1, 1 & 1.19 & 1.07 & 4.2  & 10.0 (24) & 2.9 \\
+   & RRT thr.\ 128 & 1, 1, 1 & 1.31 & 1.00 & 8.7  & 2.6 (14)  & 1.7 \\
+P2 & Dijkstra      & 2, 1, 1 & 3.58 & 3.29 & 11.9 & 7.4 (24)  & 5.2 \\
+   & RRT           & 2, 3, 2 & 4.34 & 3.26 & 17.6 & 7.9 (47)  & 3.5 \\
+   & RRT smooth    & 1, 1, 1 & 2.98 & 2.88 & 15.4 & 5.8 (24)  & 4.4 \\
+   & RRT thr.\ 128 & 1, 1, 1 & 4.08 & 3.48 & 12.6 & 6.9 (24)  & 6.4 \\
+P3 & Dijkstra      & 1, 1, 1 & 6.38 & 6.32 & 23.4 & 6.4 (28)  & 8.3 \\
+   & RRT           & 5, 3, 2 & 7.38 & 5.60 & 22.4 & 8.8 (40)  & 5.3 \\
+   & RRT smooth    & 1, 4, 2 & 5.86 & 6.09 & 24.0 & 7.0 (31)  & 5.9 \\
+   & RRT thr.\ 128 & 1, 1, 1 & 7.33 & 6.33 & 24.9 & 6.9 (36)  & 5.9 \\
+\bottomrule
+\end{tabular}
+
+\begin{itemize}
+  \item \textbf{Path following} against the active plan: 3--10\,cm mean for all RRT variants, the same order as
+        Dijkstra. DWB follows RRT paths as well as Dijkstra paths; it even smooths the zig-zag: the plain RRT path of P3
+        is 7.38\,m, the robot drives 5.60\,m (it cuts the 0.2\,m zig-zags inside its goal and path tolerances).
+  \item \textbf{Replanning} (plans per run $> 1$): plain RRT in 7/9 runs, smoothed 2/9, threshold 128 in 0/9 measured
+        runs. Events assigned to the runs by time stamp (sim log vs.\ \pkg{drive\_compare.py} log), three causes:
+        \begin{enumerate}
+          \item RRT finds no path (5000 iterations, $\approx 15$--20\,\%, see planning results): the behavior tree clears
+                the costmap and plans again (not visible as an extra plan; costs $\approx 1$\,s).
+          \item The controller gets stuck (``Failed to make progress'', 10\,s), \pkg{follow\_path} is aborted, the tree plans
+                again: few cases in this run (first run 2026-11-23: most replans, e.g.\ smoothed P3 paths tangent to
+                the pillars).
+          \item Most replans of plain RRT without either of these: the plan-once tree checks the path at 1\,Hz
+                (\pkg{IsPathValid}) and plans again if it became invalid. Most likely the live costmap (laser obstacles,
+                placed with the AMCL pose) puts the poses that pass a pillar at the minimum distance (0.16\,m) into
+                inscribed/lethal cost. Not observed with threshold 128 (0.30\,m distance) $\Rightarrow$ supports this
+                explanation; not proven from Nav2's own output (\pkg{IsPathValid} does not log).
+        \end{enumerate}
+        Every new plan is a different random route (figure: up to 4 later plans in one run). With Dijkstra the same
+        situation would give the same path again.
+  \item \textbf{Threshold 128}: one plan per measured run, smallest deviation for P1 (2.6\,cm). Price: lower planning
+        success (66--82\,\%) and longer, still zig-zag paths. In the drives \emph{to the start} (not measured) there
+        were still controller failures (16 in the log), 2 starts not reached at the first attempt.
+  \item Time: similar to Dijkstra except where replanning or a failed plan added seconds (P1 RRT: 7.9\,s vs.\ 4.4\,s).
+  \item First run (2026-11-23, same setup, deviation against the first plan): 18/18 goals, but replans up to 9 per run,
+        mostly after ``Failed to make progress'', deviation against the first plan up to 1.3\,m (route changes). Led to the
+        active-plan evaluation and the threshold-128 variant. Data overwritten by this run.
+\end{itemize}
+
+
+
 \end{document}

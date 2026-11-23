@@ -1,0 +1,10 @@
+<library path="rrt_planner">
+  <class name="rrt_planner/RRTPlannerROS"
+         type="rrt_planner::RRTPlannerROS"
+         base_class_type="nav2_core::GlobalPlanner">
+    <description>
+      RRT-based global planner plugin for Nav2 (ROS 2).
+      RRT with optional goal bias and shortcut smoothing (MP2 group 6).
+    </description>
+  </class>
+</library>
