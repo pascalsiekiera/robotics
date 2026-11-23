@@ -9,7 +9,8 @@ import yaml
 from PIL import Image
 from scipy import ndimage
 
-DEFAULT_MAP = '/opt/ros/jazzy/share/turtlebot3_navigation2/map/map.yaml'
+DEFAULT_MAP = os.path.join('/opt/ros', os.environ.get('ROS_DISTRO', 'humble'),
+                           'share/turtlebot3_navigation2/map/map.yaml')
 
 
 class StaticMap:

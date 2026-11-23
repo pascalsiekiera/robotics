@@ -1,17 +1,46 @@
 # MP2 – Path Planning, Path Following, Q-Learning
 
 Mini-Project 2 of Introduction to Robotics (IST 2026/27), Group 6.
-Status: Task 1a done (part 1: planner comparison, part 2: driving with Dijkstra + DWB).
+Status: Task 1a done under **ROS 2 Humble** (part 1: planner comparison, part 2: driving with
+Dijkstra + DWB and Dijkstra + TEB, videos). All results are from Humble (the lab robot runs Humble;
+TEB and the RRT skeleton of Task 1b need Humble).
+An earlier version under Jazzy is archived and not used: `jazzy/`, `data/task1a_jazzy/`, `figures/jazzy/`.
 
 Working notes with all decisions, parameters and results: [notes/mp2_notes.tex](notes/mp2_notes.tex)
 (compile in Overleaf).
 
 ## Requirements
 
-- ROS 2 Jazzy, Gazebo Harmonic, Nav2 (`ros-jazzy-navigation2`, `ros-jazzy-nav2-bringup`)
-- TurtleBot3 simulation: `sudo apt install ros-jazzy-turtlebot3-simulations`
-- `export TURTLEBOT3_MODEL=waffle_pi` (in `~/.bashrc`)
-- Python: numpy, scipy, matplotlib, pillow, pyyaml
+- Ubuntu 22.04 + ROS 2 Humble, Gazebo Classic 11, Nav2, TurtleBot3 simulation
+- source packages in `~/ros2_ws/src`: `teb_local_planner` (branch `humble-devel`),
+  `costmap_converter` (branch `humble`), `rrt_planner` (Task 1b skeleton)
+- Python: numpy, scipy, matplotlib, pillow, pyyaml; ffmpeg + xwininfo for the videos
+
+Setup on Windows/WSL2 (a second distro next to the Jazzy one):
+
+```bash
+# Windows PowerShell
+wsl --install -d Ubuntu-22.04
+# inside Ubuntu-22.04
+mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+git clone -b humble-devel https://github.com/rst-tu-dortmund/teb_local_planner.git
+git clone -b humble https://github.com/rst-tu-dortmund/costmap_converter.git
+git clone https://github.com/irob-labs-ist/rrt_planner.git
+git -C teb_local_planner apply <path>/mp2/setup/teb_plan_transform.patch   # see Pitfalls
+sudo bash <path>/mp2/setup/install_humble.sh   # ROS, Nav2, TB3, Gazebo, rosdep, ~/.bashrc
+cd ~/ros2_ws && MAKEFLAGS=-j2 colcon build --symlink-install --parallel-workers 1
+```
+
+`MAKEFLAGS=-j2`: compiling `teb_local_planner` needs about 1.5 GB per compiler process; with one
+process per core the compiler is killed for lack of memory under WSL2 (`Killed signal terminated
+program cc1plus`).
+
+`install_humble.sh` also mounts this repo from the Jazzy distro at `/mnt/robotics` (one copy of the
+repo; at every start via `/etc/wsl.conf`, by hand: `sudo mount-robotics`). The path in the script
+is for our machine (`\\wsl.localhost\Ubuntu\home\maya\...`); with the repo cloned inside 22.04
+this part is not needed.
+Do not run the Jazzy and the Humble simulation at the same time: both distros share the network,
+so the ROS nodes would see each other (or use different `ROS_DOMAIN_ID`s).
 
 All commands below are run from the repo root (`robotics/`).
 
@@ -20,30 +49,44 @@ All commands below are run from the repo root (`robotics/`).
 ```
 mp2/
 ├── config/
-│   ├── nav2_params.yaml      Nav2 parameters (copy of turtlebot3_navigation2 waffle_pi.yaml, changes marked "MP2")
+│   ├── nav2_params.yaml      Nav2 parameters (Humble structure, TB3 waffle_pi values, changes marked "MP2")
+│   ├── teb_controller.yaml   TEB controller, replaces DWB with sim.launch.py controller:=teb
+│   ├── mp2.rviz              RViz config (copy of tb3_navigation2.rviz + driven paths)
 │   └── test_pairs.yaml       start/goal pairs P1-P3 in turtlebot3_world
 ├── launch/
-│   ├── sim.launch.py             Gazebo + Nav2 (+ ground truth), headless by default
+│   ├── sim.launch.py             Gazebo Classic + Nav2 (+ ground truth), headless by default, controller:=dwb|teb
 │   └── planning_only.launch.py   map_server + planner_server only (no Gazebo), for the planner comparison
 ├── scripts/
 │   ├── metrics.py            path length, minimum clearance, deviation (shared by all tasks)
 │   ├── plan_compare.py       part 1: requests paths for all pairs/planners, saves paths + metrics
 │   ├── plot_plans.py         part 1: summary table + figure of the planned paths
 │   ├── run_costmap_sweep.sh  part 1: varies inflation_radius / cost_scaling_factor, one at a time
+│   ├── compare_setups.py     part 1: control run, planning-only setup vs. full simulation
+│   ├── record_video.sh       records the RViz window during drive_compare.py (ffmpeg)
 │   ├── drive_compare.py      part 2: drives all pairs, records planned/estimated/true path
 │   └── plot_drives.py        part 2: summary table + figure of the driven paths
+├── setup/install_humble.sh   one-time setup of the Humble environment
+├── jazzy/                    Jazzy versions of nav2_params.yaml, sim.launch.py, mp2.rviz (archived)
 ├── data/task1a/              results (plans_<tag>.json / .csv), launch logs of the sweep
+├── data/task1a_jazzy/        the same under Jazzy (archived)
 ├── figures/                  generated figures
+├── videos/                   RViz recordings (task1a_*.mp4; videos/jazzy/: archived Jazzy videos)
 └── notes/mp2_notes.tex       working notes for the report
 ```
 
 ## Changes in `config/nav2_params.yaml` (vs. `waffle_pi.yaml`)
+
+The Humble file is built from the structure of `nav2_bringup/params/nav2_params.yaml` (Humble) with
+the values of the Jazzy `turtlebot3_navigation2/param/waffle_pi.yaml` (same values as our Jazzy runs).
+The Humble file shipped by ROBOTIS (`param/humble/waffle_pi.yaml`) still uses Foxy names
+(`recoveries_server`) and other values (robot_radius 0.22, max_vel_x 0.22).
 
 | Change | Why |
 |---|---|
 | `amcl/set_initial_pose: true` at (-2.0, -0.5, 0) | Gazebo spawn pose in `turtlebot3_world`, no clicking in RViz |
 | behavior tree `navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml` | plan once (default replans every second); exactly one planned path per run, same conditions for Dijkstra, A* and later RRT |
 | second planner `AStar` (NavFn, `use_astar: true`) | compare with `GridBased` = NavFn with `use_astar: false` = **Dijkstra** |
+| `use_sim_time: True` in every node section | Humble's bringup only rewrites keys that are present in the file (Jazzy passes `use_sim_time` to every node); without the key the planner and controller run on wall-clock time, the plan gets a wall-clock stamp, the controller fails with "Transform data too old when converting from map to odom" and the robot does not move. `planning_only.launch.py` sets it back to false |
 | goal checker `yaw_goal_tolerance: 6.29` (was 0.25) | heading at the goal is not evaluated; with 0.25 the robot rotates at the goal, the controller gets an empty (pruned) plan, the plan-once tree does not replan and the goal fails |
 
 `GridBased` keeps its name because the behavior tree uses it as the default planner id.
@@ -56,6 +99,8 @@ Figures and tables show it as "Dijkstra".
 ```bash
 # everything in one terminal, with our parameters (headless: without gui/rviz)
 ros2 launch mp2/launch/sim.launch.py gui:=true rviz:=true
+# with TEB instead of DWB
+ros2 launch mp2/launch/sim.launch.py rviz:=true controller:=teb
 ```
 
 `sim.launch.py` starts the same world, robot and Nav2 bringup as the tutorial, with two changes to
@@ -63,8 +108,8 @@ the robot model (generated at launch time, the installed files are not modified)
 - **camera removed**: rendering it in software and bridging the raw images (≈27 MB/s) overloaded the
   CPU under WSL2 (Gazebo at 0.3× real time, laser scans only every few seconds, Nav2 did not start);
   Nav2 does not use the camera,
-- **PosePublisher plugin**: ground truth on `/ground_truth/pose` (`geometry_msgs/PoseStamped`, 30 Hz,
-  Gazebo world frame = map frame).
+- **gazebo_ros_p3d plugin**: ground truth on `/ground_truth/odom` (`nav_msgs/Odometry`, 30 Hz,
+  Gazebo world frame = map frame). (Jazzy: PosePublisher plugin, `/ground_truth/pose`.)
 
 The tutorial way (two terminals, with camera) still works:
 
@@ -89,7 +134,7 @@ costmap logs `Timed out waiting for transform from base_link to map` (expected).
 ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped "{header: {frame_id: map}, pose: {pose: {position: {x: -2.0, y: -0.5}, orientation: {w: 1.0}}, covariance: [0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.0685]}}"
 ```
 
-The map is the one shipped with ROBOTIS: `/opt/ros/jazzy/share/turtlebot3_navigation2/map/map.yaml`.
+The map is the one shipped with ROBOTIS: `/opt/ros/humble/share/turtlebot3_navigation2/map/map.yaml`.
 
 ### Part 1: planner comparison (no Gazebo)
 
@@ -121,6 +166,16 @@ python3 mp2/scripts/plot_plans.py mp2/data/task1a/plans_{csf2,baseline,csf10}.js
     --planners GridBased --name sweep_csf_dijkstra
 ```
 
+**Control run** (is the planning-only setup equivalent?): the same requests in the full simulation,
+robot localized at the spawn pose, then compare the paths:
+
+```bash
+ros2 launch mp2/launch/sim.launch.py                                      # terminal 1
+python3 mp2/scripts/plan_compare.py --reps 10 --tag fullsim               # terminal 2
+python3 mp2/scripts/compare_setups.py
+python3 mp2/scripts/plot_plans.py mp2/data/task1a/plans_{baseline,fullsim}.json --name control_run_fullsim
+```
+
 ### Metrics (`scripts/metrics.py`)
 
 | Metric | Definition | Evaluates |
@@ -134,7 +189,7 @@ python3 mp2/scripts/plot_plans.py mp2/data/task1a/plans_{csf2,baseline,csf10}.js
 
 ### Part 2: driving
 
-Dijkstra + DWB only (A* gives almost the same paths; the controller comparison is not required).
+Dijkstra (A* gives almost the same paths) with two controllers: DWB and TEB.
 The robot drives to the start of each pair (not evaluated), then the measured run. The planned path is
 the one published on `/plan` during the run (plan-once tree: the path the controller follows).
 
@@ -151,6 +206,60 @@ python3 mp2/scripts/plot_drives.py mp2/data/task1a/drives_dijkstra_dwb{,_r2,_r3}
 Start and end of a run differ from the pair coordinates by up to `xy_goal_tolerance` (0.25 m), so the
 planned lengths differ from part 1.
 
+**Localization check at the start:** after the drive to the start, `drive_compare.py` compares the AMCL
+pose with the ground truth. If they differ by more than 0.10 m (`--max-start-error`) or the start was
+not reached, the attempt is rejected (stored under `rejected` in the JSON), AMCL is set to the
+ground-truth pose and the robot drives to the start again (at most 3 attempts, `--attempts`). The
+measured run itself is never corrected. Reason: on the way to the start of P2 the robot can get stuck
+at a pillar; during the recoveries AMCL lost ≈1 m and the measured run started at the wrong place
+(seen under Jazzy, video `jazzy/task1a_localization_failure_p2.mp4`; under Humble once in the video run,
+AMCL 4.2 m off, video `task1a_dijkstra_dwb.mp4`).
+The number of rejected attempts is a result of its own (how often localization fails on the way).
+
+Same with TEB (terminal 1: `ros2 launch mp2/launch/sim.launch.py controller:=teb`):
+```bash
+python3 mp2/scripts/drive_compare.py --tag dijkstra_teb      # and _r2, _r3
+python3 mp2/scripts/plot_drives.py mp2/data/task1a/drives_dijkstra_teb{,_r2,_r3}.json --name drives_dijkstra_teb_all
+```
+
+During each measured run, `drive_compare.py` publishes the driven paths for RViz (`config/mp2.rviz`):
+`/mp2/driven_estimated` (green, tf map → base_footprint) and `/mp2/driven_true` (orange, ground truth).
+The planned path is the red `/plan` display ("Global Planner" → "Path").
+
+### Video / screenshots
+
+Videos in `mp2/videos/` (RViz map view, 2x speed, legend). Each video contains six drives: for every
+pair the drive to the start (not measured) and the measured run; a label at the top names the section.
+RViz shows the robot at the AMCL pose, not at the true pose.
+- `task1a_dijkstra_dwb.mp4` (Humble): P1, P2, P3 with Dijkstra + DWB. The first drive to the start of P2
+  was rejected by the localization check (AMCL 4.2 m off, particles spread over the map); AMCL is reset
+  and the robot drives to the start again.
+- `task1a_dijkstra_teb.mp4` (Humble): P1, P2, P3 with Dijkstra + TEB. On P3 the blue local plan of TEB
+  repeatedly jumps to a loop between the pillars (alternative route around a pillar); in this run the
+  robot stays on the global path (in repetition 3 of the measurements it took the detour).
+- `jazzy/task1a_localization_failure_p2.mp4` (Jazzy, before the localization check existed): the robot gets
+  stuck at a pillar on the way to the start of P2, AMCL loses ≈1 m during the recoveries and the measured
+  run P2 starts at the wrong place
+
+Screenshot: `figures/rviz_p3_dijkstra_dwb.png` (end of P3, from the DWB video).
+
+Record a new video (needs `ffmpeg`; under WSL2 only single windows can be recorded, the whole screen is black):
+
+```bash
+ros2 launch mp2/launch/sim.launch.py rviz:=true                                   # terminal 1
+bash mp2/scripts/record_video.sh task1a_dijkstra_dwb "Task 1a - Dijkstra + DWB (ROS 2 Humble)" --tag video_dwb   # terminal 2, ~3 min
+# TEB: terminal 1 with controller:=teb, then
+bash mp2/scripts/record_video.sh task1a_dijkstra_teb "Task 1a - Dijkstra + TEB (ROS 2 Humble)" --tag video_teb
+```
+
+The section labels come from the log of `drive_compare.py` (wall-clock time stamps of "driving to
+start" / "measured run"). RViz is started with software rendering (`LIBGL_ALWAYS_SOFTWARE=1` in
+`sim.launch.py`): with the GPU, the 3D view was empty in the recording under WSLg.
+
+`config/mp2.rviz` is set up for readable videos: costmap displays off, robot model on, top-down view
+(x right, y up) centred on the world, planned/driven paths as thick lines. The Gazebo window was not
+recorded: in the recording it did not show the robot moving.
+
 ### Results and figures
 
 Tables and observations: [notes/mp2_notes.tex](notes/mp2_notes.tex), section "Results".
@@ -161,15 +270,39 @@ Tables and observations: [notes/mp2_notes.tex](notes/mp2_notes.tex), section "Re
 | `plans_baseline.png` | part 1: Dijkstra vs. A*, default costmap |
 | `inflation_cost.png` | inflation cost over distance for the tested parameters |
 | `sweep_inflation_dijkstra.png`, `sweep_csf_dijkstra.png` | part 1: inflation radius / cost scaling factor |
-| `drives_dijkstra_dwb.png`, `drives_dijkstra_dwb_all.png` | part 2: planned, estimated and true path |
+| `drives_dijkstra_dwb.png`, `drives_dijkstra_dwb_all.png` | part 2, DWB: planned, estimated and true path |
+| `drives_dijkstra_teb.png`, `drives_dijkstra_teb_all.png` | part 2, TEB: the same (repetition 3 / P3: detour between the pillars) |
+| `control_run_fullsim.png` | part 1 control run: planning-only vs. full simulation |
+| `rviz_p3_dijkstra_dwb.png` | RViz screenshot at the end of P3 (planned, estimated, true path) |
+| `rviz_p3_dijkstra_teb_local_plan.png` | TEB on P3: the local plan (blue) loops between the pillars (alternative route) |
 
 ## Pitfalls
 
-- **Leftover processes break the next run.** `gz sim` sometimes survives Ctrl+C and keeps publishing
+- **Leftover processes break the next run.** `gzserver` (Jazzy: `gz sim`) sometimes survives Ctrl+C and keeps publishing
   `/clock`, `/scan`, `/tf`; a leftover `static_transform_publisher` (map → base_link from
   `planning_only.launch.py`) splits the TF tree of the simulation (`base_link` gets two parents,
   "Timed out waiting for transform from base_link to odom"). Before starting, check:
-  `pgrep -fa "gz sim|ros2 launch|static_transform|component_container"` (should be empty).
+  `pgrep -fa "gzserver|ros2 launch|static_transform|component_container"` (should be empty).
+- **Humble, first Gazebo start:** in a fresh environment the first `gzserver` start took longer than
+  the 30 s that `spawn_entity.py` waits by default, the robot was never spawned and Nav2 waited for
+  `odom` forever. `sim.launch.py` waits 120 s (after the first start, Gazebo is up in 3-4 s).
+- **TEB fails after 10 s of driving** ("Could not transform the global plan to the frame of the
+  controller", "Controller patience exceeded"): the ROS 2 port of TEB (humble-devel) looks up
+  map → odom at the time stamp of the plan instead of the latest one (ROS 1 TEB). With the plan-once
+  behavior tree the plan is never renewed and falls out of the 10 s tf buffer. Fixed by the one-line
+  patch `setup/teb_plan_transform.patch` (needs a rebuild of `teb_local_planner`). Without it, short
+  runs (P1) work and every run longer than 10 s fails.
+- **Humble, 10 Hz sim clock:** Gazebo Classic publishes `/clock` at 10 Hz, so time stamps of
+  different nodes can differ by one step (0.1 s); `drive_compare.py` accepts plans up to 0.5 s older
+  than the start of the run. Planning times measured in sim time are 0 (below one clock step), which
+  is one more reason why part 1 runs without Gazebo.
+- **Humble, sim time:** see `use_sim_time` in the parameter table above. Symptom: the robot does not
+  move, "Data time" in the error is the wall clock (~1.8e9 s), "Transform time" the sim time.
+- **TEB drives slower than DWB** (≈0.20 vs. ≈0.27 m/s) although both have `max_vel_x: 0.3`:
+  `penalty_epsilon: 0.1` (TEB example configuration) makes TEB's velocity penalty start at
+  0.3 − 0.1 = 0.2 m/s. Keep in mind when comparing times.
+- **RViz recording empty under WSLg (Ubuntu 22.04):** with GPU rendering, the 3D view was captured as
+  plain background. `sim.launch.py` starts RViz with `LIBGL_ALWAYS_SOFTWARE=1`.
 - Messages that queue up while a node does not spin are delivered later. `drive_compare.py` therefore
   only keeps messages with a time stamp after the start of the run.
 

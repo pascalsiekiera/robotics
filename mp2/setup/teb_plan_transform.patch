@@ -1,0 +1,23 @@
+MP2: transform the global plan with the latest map -> odom transform, as in the ROS 1 version
+of TEB (lookupTransform(global_frame, ros::Time(), plan_frame, plan_stamp, plan_frame)).
+The ROS 2 port (humble-devel, 630a22e) swapped the two times and looks up map -> odom at the
+time stamp of the plan. With a behavior tree that plans only once, the plan is older than the
+tf buffer (10 s) after 10 s of driving, the lookup fails ("Could not transform the global plan
+to the frame of the controller") and the goal is aborted.
+Apply in ~/ros2_ws/src/teb_local_planner:  git apply <path>/mp2/setup/teb_plan_transform.patch
+
+diff --git a/teb_local_planner/src/teb_local_planner_ros.cpp b/teb_local_planner/src/teb_local_planner_ros.cpp
+index 6060d8b..a385837 100644
+--- a/teb_local_planner/src/teb_local_planner_ros.cpp
++++ b/teb_local_planner/src/teb_local_planner_ros.cpp
+@@ -713,8 +713,8 @@ bool TebLocalPlannerROS::transformGlobalPlan(const std::vector<geometry_msgs::ms
+ 
+     // get plan_to_global_transform from plan frame to global_frame
+     geometry_msgs::msg::TransformStamped plan_to_global_transform = tf_->lookupTransform(
+-                global_frame, tf2_ros::fromMsg(plan_pose.header.stamp),
+-                plan_pose.header.frame_id, tf2::timeFromSec(0),
++                global_frame, tf2::TimePointZero,  // MP2: latest map->odom (as in ROS 1 TEB)
++                plan_pose.header.frame_id, tf2_ros::fromMsg(plan_pose.header.stamp),
+                 plan_pose.header.frame_id, tf2::durationFromSec(0.5));
+ 
+ //    tf_->waitForTransform(global_frame, ros::Time::now(),

@@ -1,11 +1,18 @@
-# MP2 Nav2 parameters, based on turtlebot3_navigation2/param/waffle_pi.yaml (ROS 2 Jazzy).
+# MP2 Nav2 parameters for ROS 2 Humble.
+# Structure (node and plugin names) as in nav2_bringup/params/nav2_params.yaml (Humble), values
+# as in turtlebot3_navigation2/param/waffle_pi.yaml (Jazzy), so that the results stay comparable
+# with the earlier Jazzy runs (mp2/jazzy/nav2_params.yaml). The Humble file of turtlebot3_navigation2
+# (param/humble/waffle_pi.yaml) is not used: it still has Foxy parameter names (recoveries_server).
 # Changes (marked with "MP2"):
 #  - amcl: initial pose set automatically at the Gazebo spawn pose (-2.0, -0.5, 0)
 #  - bt_navigator: plan once, replan only if the goal changes or the path becomes invalid
 #  - planner_server: second planner "AStar" (NavFn with A*) next to "GridBased" (NavFn, Dijkstra)
 #  - controller_server goal_checker: yaw_goal_tolerance 6.29 (heading at the goal not checked)
+# The controller "FollowPath" is DWB; sim.launch.py controller:=teb replaces it with the block in
+# config/teb_controller.yaml.
 amcl:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     alpha1: 0.2
     alpha2: 0.2
     alpha3: 0.2
@@ -55,64 +62,76 @@ amcl:
 
 bt_navigator:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     global_frame: map
     robot_base_frame: base_link
+    odom_topic: /odom
     transform_tolerance: 0.5
-    filter_duration: 0.3
+    bt_loop_duration: 10
+    default_server_timeout: 20
+    wait_for_service_timeout: 1000
     # MP2: plan once, replan only if the goal changes or the path becomes invalid
-    default_nav_to_pose_bt_xml: "$(find-pkg-share nav2_bt_navigator)/behavior_trees/navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml"
-    default_nav_through_poses_bt_xml: "$(find-pkg-share nav2_bt_navigator)/behavior_trees/navigate_to_pose_w_replanning_and_recovery.xml"
-    always_reload_bt_xml: false
-    goal_blackboard_id: goal
-    goals_blackboard_id: goals
-    path_blackboard_id: path
-    navigators: ['navigate_to_pose', 'navigate_through_poses']
-    navigate_to_pose:
-      plugin: "nav2_bt_navigator::NavigateToPoseNavigator"
-    navigate_through_poses:
-      plugin: "nav2_bt_navigator::NavigateThroughPosesNavigator"
-    error_code_name_prefixes:
-      - assisted_teleop
-      - backup
-      - compute_path
-      - dock_robot
-      - drive_on_heading
-      - follow_path
-      - nav_thru_poses
-      - nav_to_pose
-      - spin
-      - route
-      - undock_robot
-      - wait
-
-docking_server:
-  ros__parameters:
-    dock_plugins: ['nova_carter_dock']
-    nova_carter_dock:
-      plugin: 'opennav_docking::SimpleChargingDock'
-    docks: ['home_dock','flex_dock1', 'flex_dock2']
-    home_dock:
-      type: 'nova_carter_dock'
-      frame: map
-      pose: [0.0, 0.0, 0.0]
-    flex_dock1:
-      type: 'nova_carter_dock'
-      frame: map
-      pose: [10.0, 10.0, 0.0]
-    flex_dock2:
-      type: 'nova_carter_dock'
-      frame: map
-      pose: [30.0, 30.0, 0.0]
-    enable_stamped_cmd_vel: true
+    # (Humble does not resolve $(find-pkg-share ...) here, so the installed path is given)
+    default_nav_to_pose_bt_xml: "/opt/ros/humble/share/nav2_bt_navigator/behavior_trees/navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml"
+    plugin_lib_names:
+      - nav2_compute_path_to_pose_action_bt_node
+      - nav2_compute_path_through_poses_action_bt_node
+      - nav2_smooth_path_action_bt_node
+      - nav2_follow_path_action_bt_node
+      - nav2_spin_action_bt_node
+      - nav2_wait_action_bt_node
+      - nav2_assisted_teleop_action_bt_node
+      - nav2_back_up_action_bt_node
+      - nav2_drive_on_heading_bt_node
+      - nav2_clear_costmap_service_bt_node
+      - nav2_is_stuck_condition_bt_node
+      - nav2_goal_reached_condition_bt_node
+      - nav2_goal_updated_condition_bt_node
+      - nav2_globally_updated_goal_condition_bt_node
+      - nav2_is_path_valid_condition_bt_node
+      - nav2_initial_pose_received_condition_bt_node
+      - nav2_reinitialize_global_localization_service_bt_node
+      - nav2_rate_controller_bt_node
+      - nav2_distance_controller_bt_node
+      - nav2_speed_controller_bt_node
+      - nav2_truncate_path_action_bt_node
+      - nav2_truncate_path_local_action_bt_node
+      - nav2_goal_updater_node_bt_node
+      - nav2_recovery_node_bt_node
+      - nav2_pipeline_sequence_bt_node
+      - nav2_round_robin_node_bt_node
+      - nav2_transform_available_condition_bt_node
+      - nav2_time_expired_condition_bt_node
+      - nav2_path_expiring_timer_condition
+      - nav2_distance_traveled_condition_bt_node
+      - nav2_single_trigger_bt_node
+      - nav2_goal_updated_controller_bt_node
+      - nav2_is_battery_low_condition_bt_node
+      - nav2_navigate_through_poses_action_bt_node
+      - nav2_navigate_to_pose_action_bt_node
+      - nav2_remove_passed_goals_action_bt_node
+      - nav2_planner_selector_bt_node
+      - nav2_controller_selector_bt_node
+      - nav2_goal_checker_selector_bt_node
+      - nav2_controller_cancel_bt_node
+      - nav2_path_longer_on_approach_bt_node
+      - nav2_wait_cancel_bt_node
+      - nav2_spin_cancel_bt_node
+      - nav2_back_up_cancel_bt_node
+      - nav2_assisted_teleop_cancel_bt_node
+      - nav2_drive_on_heading_cancel_bt_node
+      - nav2_is_battery_charging_condition_bt_node
 
 controller_server:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     controller_frequency: 10.0
+    odom_topic: /odom
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
     failure_tolerance: 0.3
-    progress_checker_plugins: ["progress_checker"]
+    progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["goal_checker"]
     controller_plugins: ["FollowPath"]
     progress_checker:
@@ -168,11 +187,11 @@ controller_server:
       RotateToGoal.scale: 32.0
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
-    enable_stamped_cmd_vel: true
 
 local_costmap:
   local_costmap:
     ros__parameters:
+      use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
       update_frequency: 5.0
       publish_frequency: 2.0
       global_frame: odom
@@ -217,13 +236,12 @@ local_costmap:
           raytrace_min_range: 0.0
           obstacle_max_range: 2.5
           obstacle_min_range: 0.0
-      static_layer:
-        map_subscribe_transient_local: true
       always_send_full_costmap: true
 
 global_costmap:
   global_costmap:
     ros__parameters:
+      use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
@@ -279,10 +297,12 @@ global_costmap:
 
 map_server:
   ros__parameters:
-    yaml_filename: "map.yaml"
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
+    yaml_filename: ""  # set by the launch files
 
 map_saver:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     save_map_timeout: 5.0
     free_thresh_default: 0.25
     occupied_thresh_default: 0.65
@@ -290,49 +310,58 @@ map_saver:
 
 planner_server:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     expected_planner_frequency: 10.0
     planner_plugins: ["GridBased", "AStar"]  # MP2: AStar added
     GridBased:  # Dijkstra
-      plugin: "nav2_navfn_planner::NavfnPlanner"
+      plugin: "nav2_navfn_planner/NavfnPlanner"
       tolerance: 0.5
       use_astar: false
       allow_unknown: true
     AStar:  # MP2: same as GridBased, but A*
-      plugin: "nav2_navfn_planner::NavfnPlanner"
+      plugin: "nav2_navfn_planner/NavfnPlanner"
       tolerance: 0.5
       use_astar: true
       allow_unknown: true
 
+smoother_server:
+  ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      max_its: 1000
+      do_refinement: true
+
 behavior_server:
   ros__parameters:
-    local_costmap_topic: local_costmap/costmap_raw
-    local_footprint_topic: local_costmap/published_footprint
-    global_costmap_topic: global_costmap/costmap_raw
-    global_footprint_topic: global_costmap/published_footprint
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
     cycle_frequency: 10.0
-    behavior_plugins: ["spin", "backup", "drive_on_heading", "wait", "assisted_teleop"]
+    behavior_plugins: ["spin", "backup", "drive_on_heading", "assisted_teleop", "wait"]
     spin:
-      plugin: "nav2_behaviors::Spin" # In Iron and older versions, "/" was used instead of "::"
+      plugin: "nav2_behaviors/Spin"
     backup:
-      plugin: "nav2_behaviors::BackUp" # In Iron and older versions, "/" was used instead of "::"
+      plugin: "nav2_behaviors/BackUp"
     drive_on_heading:
-      plugin: "nav2_behaviors::DriveOnHeading" # In Iron and older versions, "/" was used instead of "::"
+      plugin: "nav2_behaviors/DriveOnHeading"
     wait:
-      plugin: "nav2_behaviors::Wait" # In Iron and older versions, "/" was used instead of "::"
+      plugin: "nav2_behaviors/Wait"
     assisted_teleop:
-      plugin: "nav2_behaviors::AssistedTeleop" # In Iron and older versions, "/" was used instead of "::"
-    local_frame: odom
-    global_frame: map
+      plugin: "nav2_behaviors/AssistedTeleop"
+    global_frame: odom
     robot_base_frame: base_link
-    transform_timeout: 0.1
+    transform_tolerance: 0.1
     simulate_ahead_time: 2.0
     max_rotational_vel: 1.0
     min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
-    enable_stamped_cmd_vel: true
 
 waypoint_follower:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     loop_rate: 20
     stop_on_failure: false
     waypoint_task_executor_plugin: "wait_at_waypoint"
@@ -341,98 +370,9 @@ waypoint_follower:
       enabled: true
       waypoint_pause_duration: 200
 
-collision_monitor:
-  ros__parameters:
-    base_frame_id: "base_footprint"
-    odom_frame_id: "odom"
-    cmd_vel_in_topic: "cmd_vel_smoothed"
-    cmd_vel_out_topic: "cmd_vel"
-    state_topic: "collision_monitor_state"
-    transform_tolerance: 0.5
-    source_timeout: 5.0
-    base_shift_correction: true
-    stop_pub_timeout: 2.0
-    enable_stamped_cmd_vel: true
-    use_realtime_priority: false
-    polygons: ["PolygonStop", "PolygonSlow", "FootprintApproach"]
-    PolygonStop:
-      type: "circle"
-      radius: 0.1
-      action_type: "stop"
-      min_points: 4
-      visualize: true
-      polygon_pub_topic: "polygon_stop"
-      enabled: true
-    PolygonSlow:
-      type: "polygon"
-      points: "[[0.1, 0.1], [0.1, -0.1], [-0.1, -0.1], [-0.1, 0.1]]"
-      action_type: "slowdown"
-      min_points: 4
-      slowdown_ratio: 0.3
-      visualize: true
-      polygon_pub_topic: "polygon_slowdown"
-      enabled: true
-    PolygonLimit:
-      type: "polygon"
-      points: "[[0.1, 0.1], [0.1, -0.1], [-0.1, -0.1], [-0.1, 0.1]]"
-      action_type: "limit"
-      min_points: 4
-      linear_limit: 0.4
-      angular_limit: 0.5
-      visualize: true
-      polygon_pub_topic: "polygon_limit"
-      enabled: true
-    FootprintApproach:
-      type: "polygon"
-      action_type: "approach"
-      footprint_topic: "/local_costmap/published_footprint"
-      time_before_collision: 2.0
-      simulation_time_step: 0.02
-      min_points: 6
-      visualize: False
-      enabled: true
-    VelocityPolygonStop:
-      type: "velocity_polygon"
-      action_type: "stop"
-      min_points: 6
-      visualize: true
-      enabled: False
-      polygon_pub_topic: "velocity_polygon_stop"
-      velocity_polygons: ["rotation", "translation_forward", "translation_backward", "stopped"]
-      holonomic: false
-      rotation:
-        points: "[[0.3, 0.3], [0.3, -0.3], [-0.3, -0.3], [-0.3, 0.3]]"
-        linear_min: 0.0
-        linear_max: 0.05
-        theta_min: -1.0
-        theta_max: 1.0
-      translation_forward:
-        points: "[[0.35, 0.3], [0.35, -0.3], [-0.2, -0.3], [-0.2, 0.3]]"
-        linear_min: 0.0
-        linear_max: 1.0
-        theta_min: -1.0
-        theta_max: 1.0
-      translation_backward:
-        points: "[[0.2, 0.3], [0.2, -0.3], [-0.35, -0.3], [-0.35, 0.3]]"
-        linear_min: -1.0
-        linear_max: 0.0
-        theta_min: -1.0
-        theta_max: 1.0
-      stopped:
-        points: "[[0.25, 0.25], [0.25, -0.25], [-0.25, -0.25], [-0.25, 0.25]]"
-        linear_min: -1.0
-        linear_max: 1.0
-        theta_min: -1.0
-        theta_max: 1.0
-    observation_sources: ["scan"]
-    scan:
-      source_timeout: 0.2
-      type: "scan"
-      topic: "/scan"
-      enabled: true
-
 velocity_smoother:
   ros__parameters:
+    use_sim_time: True  # MP2: Humble bringup only rewrites keys present in this file
     smoothing_frequency: 20.0
     scale_velocities: false
     feedback: "OPEN_LOOP"
@@ -444,5 +384,3 @@ velocity_smoother:
     max_decel: [-2.5, 0.0, -3.2]
     odom_topic: "odom"
     odom_duration: 0.1
-    use_realtime_priority: false
-    enable_stamped_cmd_vel: true

@@ -3,7 +3,7 @@
 # cost_scaling_factor 5.0) and compare the planned paths. Runs without Gazebo.
 # Usage: bash mp2/scripts/run_costmap_sweep.sh [reps]
 set -e
-source /opt/ros/jazzy/setup.bash
+source "/opt/ros/${ROS_DISTRO:-humble}/setup.bash"
 MP2="$(cd "$(dirname "$0")/.." && pwd)"
 REPS="${1:-10}"
 LOG_DIR="$MP2/data/task1a/logs"

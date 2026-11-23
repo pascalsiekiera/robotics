@@ -17,6 +17,7 @@ import os
 import tempfile
 
 import yaml
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
@@ -24,7 +25,7 @@ from launch_ros.actions import Node
 
 MP2 = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_PARAMS = os.path.join(MP2, 'config', 'nav2_params.yaml')
-DEFAULT_MAP = '/opt/ros/jazzy/share/turtlebot3_navigation2/map/map.yaml'
+DEFAULT_MAP = os.path.join(get_package_share_directory('turtlebot3_navigation2'), 'map', 'map.yaml')
 
 
 def make_nodes(context):

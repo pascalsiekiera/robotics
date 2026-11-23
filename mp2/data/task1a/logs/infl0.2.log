@@ -1,74 +1,104 @@
-[INFO] [launch]: All log files can be found below /home/maya/.ros/log/2026-11-10-17-15-46-264500-matchalaptop-21323
+[INFO] [launch]: All log files can be found below /home/kiama/.ros/log/2026-11-22-23-30-15-797445-matchalaptop-37324
 [INFO] [launch]: Default logging verbosity is set to INFO
 [planning_only] global costmap: robot_radius 0.15, inflation_radius 0.2, cost_scaling_factor 5.0
-[INFO] [map_server-1]: process started with pid [21333]
-[INFO] [planner_server-2]: process started with pid [21334]
-[INFO] [static_transform_publisher-3]: process started with pid [21335]
-[INFO] [lifecycle_manager-4]: process started with pid [21336]
-[lifecycle_manager-4] [INFO] [1794330946.585765671] [lifecycle_manager_planning]: Creating
-[static_transform_publisher-3] [INFO] [1794330946.588126497] [static_transform_publisher_OT7QvKeCHcESdzJj]: Spinning until stopped - publishing transform
+[INFO] [map_server-1]: process started with pid [37328]
+[INFO] [planner_server-2]: process started with pid [37330]
+[INFO] [static_transform_publisher-3]: process started with pid [37332]
+[INFO] [lifecycle_manager-4]: process started with pid [37334]
+[lifecycle_manager-4] [INFO] [1795390215.940456785] [lifecycle_manager_planning]: Creating
+[static_transform_publisher-3] [INFO] [1795390215.940782729] [static_transform_publisher_pv1hSa4cOPmQbHYl]: Spinning until stopped - publishing transform
 [static_transform_publisher-3] translation: ('-2.000000', '-0.500000', '0.000000')
 [static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
 [static_transform_publisher-3] from 'map' to 'base_link'
-[planner_server-2] [INFO] [1794330946.589926867] [planner_server]: 
+[lifecycle_manager-4] [INFO] [1795390215.943714004] [lifecycle_manager_planning]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[planner_server-2] [INFO] [1795390215.950400779] [planner_server]: 
 [planner_server-2] 	planner_server lifecycle node launched. 
 [planner_server-2] 	Waiting on external lifecycle transitions to activate
 [planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-[planner_server-2] [INFO] [1794330946.591879421] [planner_server]: Creating
-[lifecycle_manager-4] [INFO] [1794330946.592318868] [lifecycle_manager_planning]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
-[map_server-1] [INFO] [1794330946.610471777] [map_server]: 
-[map_server-1] 	map_server lifecycle node launched. 
-[map_server-1] 	Waiting on external lifecycle transitions to activate
-[map_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-[map_server-1] [INFO] [1794330946.610665299] [map_server]: Creating
-[lifecycle_manager-4] [INFO] [1794330946.611083418] [lifecycle_manager_planning]: [34m[1mStarting managed nodes bringup...[0m[0m
-[lifecycle_manager-4] [INFO] [1794330946.611136038] [lifecycle_manager_planning]: [34m[1mConfiguring map_server[0m[0m
-[planner_server-2] [INFO] [1794330946.611510208] [global_costmap.global_costmap]: 
+[planner_server-2] [INFO] [1795390215.951832389] [planner_server]: Creating
+[planner_server-2] [INFO] [1795390215.961197412] [global_costmap.global_costmap]: 
 [planner_server-2] 	global_costmap lifecycle node launched. 
 [planner_server-2] 	Waiting on external lifecycle transitions to activate
 [planner_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-[planner_server-2] [INFO] [1794330946.612243556] [global_costmap.global_costmap]: Creating Costmap
-[map_server-1] [INFO] [1794330946.751221036] [map_server]: Configuring
-[map_server-1] [INFO] [1794330946.751425881] [map_io]: Loading yaml file: /opt/ros/jazzy/share/turtlebot3_navigation2/map/map.yaml
-[map_server-1] [INFO] [1794330946.751949469] [map_io]: resolution: 0.05
-[map_server-1] [INFO] [1794330946.751974195] [map_io]: origin[0]: -10
-[map_server-1] [INFO] [1794330946.751980490] [map_io]: origin[1]: -10
-[map_server-1] [INFO] [1794330946.751984936] [map_io]: origin[2]: 0
-[map_server-1] [INFO] [1794330946.751989528] [map_io]: free_thresh: 0.196
-[map_server-1] [INFO] [1794330946.751994034] [map_io]: occupied_thresh: 0.65
-[map_server-1] [INFO] [1794330946.752000095] [map_io]: mode: trinary
-[map_server-1] [INFO] [1794330946.752005559] [map_io]: negate: 0
-[map_server-1] [INFO] [1794330946.752341738] [map_io]: Loading image_file: /opt/ros/jazzy/share/turtlebot3_navigation2/map/map.pgm
-[map_server-1] [INFO] [1794330946.759872888] [map_io]: Read map /opt/ros/jazzy/share/turtlebot3_navigation2/map/map.pgm: 384 X 384 map @ 0.05 m/cell
-[lifecycle_manager-4] [INFO] [1794330946.775335545] [lifecycle_manager_planning]: [34m[1mConfiguring planner_server[0m[0m
-[planner_server-2] [INFO] [1794330946.775887761] [planner_server]: Configuring
-[planner_server-2] [INFO] [1794330946.775944778] [global_costmap.global_costmap]: Configuring
-[planner_server-2] [INFO] [1794330946.791020936] [global_costmap.global_costmap]: Using plugin "static_layer"
-[planner_server-2] [INFO] [1794330946.797604668] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
-[planner_server-2] [INFO] [1794330946.801082023] [global_costmap.global_costmap]: Initialized plugin "static_layer"
-[planner_server-2] [INFO] [1794330946.801189786] [global_costmap.global_costmap]: Using plugin "inflation_layer"
-[planner_server-2] [INFO] [1794330946.802180102] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
-[planner_server-2] [INFO] [1794330946.842241277] [planner_server]: Created global planner plugin GridBased of type nav2_navfn_planner::NavfnPlanner
-[planner_server-2] [INFO] [1794330946.842334671] [planner_server]: Configuring plugin GridBased of type NavfnPlanner
-[planner_server-2] [INFO] [1794330946.843244762] [planner_server]: Created global planner plugin AStar of type nav2_navfn_planner::NavfnPlanner
-[planner_server-2] [INFO] [1794330946.843293375] [planner_server]: Configuring plugin AStar of type NavfnPlanner
-[planner_server-2] [INFO] [1794330946.843818325] [planner_server]: Planner Server has GridBased AStar  planners available.
-[lifecycle_manager-4] [INFO] [1794330946.862116825] [lifecycle_manager_planning]: [34m[1mActivating map_server[0m[0m
-[map_server-1] [INFO] [1794330946.862489473] [map_server]: Activating
-[map_server-1] [INFO] [1794330946.863039454] [map_server]: Creating bond (map_server) to lifecycle manager.
-[planner_server-2] [INFO] [1794330946.863576343] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 384 X 384 at 0.050000 m/pix
-[lifecycle_manager-4] [INFO] [1794330946.973218271] [lifecycle_manager_planning]: Server map_server connected with bond.
-[lifecycle_manager-4] [INFO] [1794330946.973288582] [lifecycle_manager_planning]: [34m[1mActivating planner_server[0m[0m
-[planner_server-2] [INFO] [1794330946.973615273] [planner_server]: Activating
-[planner_server-2] [INFO] [1794330946.973660600] [global_costmap.global_costmap]: Activating
-[planner_server-2] [INFO] [1794330946.973670349] [global_costmap.global_costmap]: Checking transform
-[planner_server-2] [INFO] [1794330946.973880844] [global_costmap.global_costmap]: start
-[planner_server-2] [INFO] [1794330947.026313743] [planner_server]: Activating plugin AStar of type NavfnPlanner
-[planner_server-2] [INFO] [1794330947.026447847] [planner_server]: Activating plugin GridBased of type NavfnPlanner
-[planner_server-2] [INFO] [1794330947.031464661] [planner_server]: Creating bond (planner_server) to lifecycle manager.
-[lifecycle_manager-4] [INFO] [1794330947.155478490] [lifecycle_manager_planning]: Server planner_server connected with bond.
-[lifecycle_manager-4] [INFO] [1794330947.155648438] [lifecycle_manager_planning]: [34m[1mManaged nodes are active[0m[0m
-[lifecycle_manager-4] [INFO] [1794330947.155671255] [lifecycle_manager_planning]: [34m[1mCreating bond timer...[0m[0m
-[ERROR] [lifecycle_manager-4]: process has died [pid 21336, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_lifecycle_manager/lifecycle_manager --ros-args -r __node:=lifecycle_manager_planning --params-file /tmp/launch_params_60yjrk5a'].
-[ERROR] [map_server-1]: process has died [pid 21333, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_map_server/map_server --ros-args -r __node:=map_server --params-file /tmp/tmpgq3u7cre_planning_only.yaml'].
-[ERROR] [planner_server-2]: process has died [pid 21334, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_planner/planner_server --ros-args -r __node:=planner_server --params-file /tmp/tmpgq3u7cre_planning_only.yaml'].
+[map_server-1] [INFO] [1795390215.952108746] [map_server]: 
+[map_server-1] 	map_server lifecycle node launched. 
+[map_server-1] 	Waiting on external lifecycle transitions to activate
+[map_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[map_server-1] [INFO] [1795390215.952221773] [map_server]: Creating
+[map_server-1] [INFO] [1795390215.952859758] [map_server]: Configuring
+[map_server-1] [INFO] [1795390215.952927738] [map_io]: Loading yaml file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.yaml
+[map_server-1] [INFO] [1795390215.953229143] [map_io]: resolution: 0.05
+[map_server-1] [INFO] [1795390215.953241644] [map_io]: origin[0]: -10
+[map_server-1] [INFO] [1795390215.953246601] [map_io]: origin[1]: -10
+[map_server-1] [INFO] [1795390215.953250711] [map_io]: origin[2]: 0
+[map_server-1] [INFO] [1795390215.953255126] [map_io]: free_thresh: 0.196
+[map_server-1] [INFO] [1795390215.953259901] [map_io]: occupied_thresh: 0.65
+[map_server-1] [INFO] [1795390215.953265401] [map_io]: mode: trinary
+[map_server-1] [INFO] [1795390215.953270669] [map_io]: negate: 0
+[map_server-1] [INFO] [1795390215.954016435] [map_io]: Loading image_file: /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm
+[lifecycle_manager-4] [INFO] [1795390215.952518800] [lifecycle_manager_planning]: [34m[1mStarting managed nodes bringup...[0m[0m
+[lifecycle_manager-4] [INFO] [1795390215.952557882] [lifecycle_manager_planning]: [34m[1mConfiguring map_server[0m[0m
+[planner_server-2] [INFO] [1795390215.961586269] [global_costmap.global_costmap]: Creating Costmap
+[map_server-1] [INFO] [1795390215.966545042] [map_io]: Read map /opt/ros/humble/share/turtlebot3_navigation2/map/map.pgm: 384 X 384 map @ 0.05 m/cell
+[lifecycle_manager-4] [INFO] [1795390215.971147055] [lifecycle_manager_planning]: [34m[1mConfiguring planner_server[0m[0m
+[planner_server-2] [INFO] [1795390215.971483988] [planner_server]: Configuring
+[planner_server-2] [INFO] [1795390215.971524139] [global_costmap.global_costmap]: Configuring
+[planner_server-2] [INFO] [1795390215.976164661] [global_costmap.global_costmap]: Using plugin "static_layer"
+[planner_server-2] [INFO] [1795390215.978920345] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
+[planner_server-2] [INFO] [1795390215.980123042] [global_costmap.global_costmap]: Initialized plugin "static_layer"
+[planner_server-2] [INFO] [1795390215.980154102] [global_costmap.global_costmap]: Using plugin "inflation_layer"
+[planner_server-2] [INFO] [1795390215.980587547] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
+[planner_server-2] [INFO] [1795390215.987830369] [planner_server]: Created global planner plugin GridBased of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795390215.987894643] [planner_server]: Configuring plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795390215.988395317] [planner_server]: Created global planner plugin AStar of type nav2_navfn_planner/NavfnPlanner
+[planner_server-2] [INFO] [1795390215.988418406] [planner_server]: Configuring plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795390215.988702033] [planner_server]: Planner Server has GridBased AStar  planners available.
+[lifecycle_manager-4] [INFO] [1795390215.995326430] [lifecycle_manager_planning]: [34m[1mActivating map_server[0m[0m
+[map_server-1] [INFO] [1795390215.995557096] [map_server]: Activating
+[map_server-1] [INFO] [1795390215.995796392] [map_server]: Creating bond (map_server) to lifecycle manager.
+[lifecycle_manager-4] [INFO] [1795390216.099185921] [lifecycle_manager_planning]: Server map_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795390216.099253431] [lifecycle_manager_planning]: [34m[1mActivating planner_server[0m[0m
+[planner_server-2] [INFO] [1795390216.099527826] [planner_server]: Activating
+[planner_server-2] [INFO] [1795390216.099566939] [global_costmap.global_costmap]: Activating
+[planner_server-2] [INFO] [1795390216.099576500] [global_costmap.global_costmap]: Checking transform
+[planner_server-2] [INFO] [1795390216.099696136] [global_costmap.global_costmap]: start
+[planner_server-2] [WARN] [1795390216.099863398] [nav2_costmap_2d]: Robot is out of bounds of the costmap!
+[planner_server-2] [INFO] [1795390216.117528165] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 384 X 384 at 0.050000 m/pix
+[planner_server-2] [INFO] [1795390216.150062081] [planner_server]: Activating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795390216.150131159] [planner_server]: Activating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795390216.151151756] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[lifecycle_manager-4] [INFO] [1795390216.254571056] [lifecycle_manager_planning]: Server planner_server connected with bond.
+[lifecycle_manager-4] [INFO] [1795390216.254651620] [lifecycle_manager_planning]: [34m[1mManaged nodes are active[0m[0m
+[lifecycle_manager-4] [INFO] [1795390216.254664245] [lifecycle_manager_planning]: [34m[1mCreating bond timer...[0m[0m
+[lifecycle_manager-4] [INFO] [1795390220.266303502] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795390220.266432871] [lifecycle_manager_planning]: Running Nav2 LifecycleManager rcl preshutdown (lifecycle_manager_planning)
+[planner_server-2] [INFO] [1795390220.266304890] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[planner_server-2] [INFO] [1795390220.266432185] [planner_server]: Running Nav2 LifecycleNode rcl preshutdown (planner_server)
+[planner_server-2] [INFO] [1795390220.266516505] [planner_server]: Deactivating
+[map_server-1] [INFO] [1795390220.266308788] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[map_server-1] [INFO] [1795390220.266434358] [map_server]: Running Nav2 LifecycleNode rcl preshutdown (map_server)
+[map_server-1] [INFO] [1795390220.266516763] [map_server]: Deactivating
+[static_transform_publisher-3] [INFO] [1795390220.266309233] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[lifecycle_manager-4] [INFO] [1795390220.266484288] [lifecycle_manager_planning]: [34m[1mTerminating bond timer...[0m[0m
+[planner_server-2] [INFO] [1795390220.266545920] [global_costmap.global_costmap]: Deactivating
+[map_server-1] [INFO] [1795390220.266533293] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[map_server-1] [INFO] [1795390220.276911551] [map_server]: Cleaning up
+[map_server-1] [INFO] [1795390220.276999169] [map_server]: Destroying bond (map_server) to lifecycle manager.
+[map_server-1] [INFO] [1795390220.280062585] [map_server]: Destroying
+[lifecycle_manager-4] [INFO] [1795390220.290854775] [lifecycle_manager_planning]: Destroying lifecycle_manager_planning
+[INFO] [static_transform_publisher-3]: process has finished cleanly [pid 37332]
+[INFO] [map_server-1]: process has finished cleanly [pid 37328]
+[INFO] [lifecycle_manager-4]: process has finished cleanly [pid 37334]
+[planner_server-2] [INFO] [1795390221.100370346] [planner_server]: Deactivating plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.100477267] [planner_server]: Deactivating plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.100499834] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795390221.110830226] [planner_server]: Cleaning up
+[planner_server-2] [INFO] [1795390221.115654840] [global_costmap.global_costmap]: Cleaning up
+[planner_server-2] [INFO] [1795390221.117369738] [planner_server]: Cleaning up plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.117478006] [planner_server]: Cleaning up plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.117490992] [planner_server]: Destroying plugin AStar of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.117498556] [planner_server]: Destroying plugin GridBased of type NavfnPlanner
+[planner_server-2] [INFO] [1795390221.120698517] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[planner_server-2] [INFO] [1795390221.122581929] [global_costmap.global_costmap]: Destroying
+[planner_server-2] [INFO] [1795390221.126567951] [planner_server]: Destroying
+[INFO] [planner_server-2]: process has finished cleanly [pid 37330]
