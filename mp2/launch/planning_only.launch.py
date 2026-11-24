@@ -14,7 +14,8 @@ Run:
 Costmap parameters that can be overridden (empty = value from the params file):
     inflation_radius, cost_scaling_factor, robot_radius
 RRT parameters (planner "RRT", Task 1b) that can be overridden:
-    rrt_step, rrt_goal_bias, rrt_cost_threshold, rrt_smoothing (true/false), rrt_seed
+    rrt_step, rrt_goal_bias, rrt_cost_threshold, rrt_smoothing (true/false),
+    rrt_allow_unknown (true/false), rrt_seed
 """
 import os
 import tempfile
@@ -51,7 +52,8 @@ def make_nodes(context):
             target[name] = float(value)
     rrt = params['planner_server']['ros__parameters'].get('RRT')
     for name, convert in (('step', float), ('goal_bias', float), ('cost_threshold', int),
-                          ('smoothing', lambda v: v.lower() == 'true'), ('seed', int)):
+                          ('smoothing', lambda v: v.lower() == 'true'),
+                          ('allow_unknown', lambda v: v.lower() == 'true'), ('seed', int)):
         value = LaunchConfiguration('rrt_' + name).perform(context)
         if value and rrt is not None:
             rrt['rrt.' + name] = convert(value)
@@ -93,6 +95,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rrt_goal_bias', default_value=''),
         DeclareLaunchArgument('rrt_cost_threshold', default_value=''),
         DeclareLaunchArgument('rrt_smoothing', default_value=''),
+        DeclareLaunchArgument('rrt_allow_unknown', default_value=''),
         DeclareLaunchArgument('rrt_seed', default_value=''),
         OpaqueFunction(function=make_nodes),
     ])

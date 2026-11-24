@@ -1,0 +1,185 @@
+{
+ "tag": "dijkstra_rrt",
+ "waypoints_file": "/mnt/robotics/mp2/config/waypoints_lsdc3.yaml",
+ "map": "mp1/maps/map_2a_merged.yaml",
+ "waypoints": [
+  {
+   "name": "1",
+   "x": 2.8,
+   "y": 3.5,
+   "yaw": -0.8465463260467496
+  },
+  {
+   "name": "2",
+   "x": 5.1,
+   "y": 0.9,
+   "yaw": 1.523213223517913
+  },
+  {
+   "name": "3",
+   "x": 5.2,
+   "y": 3.0,
+   "yaw": -2.8134727585744876
+  },
+  {
+   "name": "4",
+   "x": 0.5,
+   "y": 1.4,
+   "yaw": 0.7399748839758713
+  }
+ ],
+ "planners": [
+  "dijkstra",
+  "rrt"
+ ],
+ "behavior_trees": {
+  "dijkstra": "/opt/ros/humble/share/nav2_bt_navigator/behavior_trees/navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml",
+  "rrt": "/tmp/tmpkgv9h7gp_bt_rrt.xml"
+ },
+ "attempts": [
+  {
+   "t_start": 1795534932.0485876,
+   "t_end": 1795534955.3471575,
+   "duration_s": 22.6610021529998,
+   "rrt_plans": 0,
+   "recoveries": 0,
+   "distance_remaining_m": 0.08573517948389053,
+   "final_pose": [
+    2.8758486304856237,
+    3.4359388335280814,
+    2.5750534643299092
+   ],
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "1",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795534955.4812007,
+   "t_end": 1795534979.2611554,
+   "duration_s": 23.060769953999852,
+   "rrt_plans": 0,
+   "recoveries": 0,
+   "distance_remaining_m": 0.07673994451761246,
+   "final_pose": [
+    5.165215513601771,
+    0.9575116184081747,
+    -2.434451282239745
+   ],
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "2",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795534979.4350283,
+   "t_end": 1795534993.2987823,
+   "duration_s": 13.861975518000008,
+   "rrt_plans": 0,
+   "recoveries": 0,
+   "distance_remaining_m": 0.1198355033993721,
+   "final_pose": [
+    5.16207067365153,
+    2.9131098732639726,
+    1.0427728645247434
+   ],
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "3",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795534993.489006,
+   "t_end": 1795535026.4707506,
+   "duration_s": 32.35857929200006,
+   "rrt_plans": 0,
+   "recoveries": 0,
+   "distance_remaining_m": 0.0,
+   "final_pose": [
+    0.41365378422470744,
+    1.4379666576601164,
+    -0.23300736452167675
+   ],
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "4",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795535026.6296422,
+   "t_end": 1795535060.1721258,
+   "duration_s": 32.92223385700004,
+   "rrt_plans": 1,
+   "recoveries": 0,
+   "distance_remaining_m": 0.0,
+   "final_pose": [
+    2.7222615846682743,
+    3.551907220366095,
+    -0.7200411417833671
+   ],
+   "round": 2,
+   "planner": "rrt",
+   "waypoint": "1",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795535060.3490605,
+   "t_end": 1795535087.519463,
+   "duration_s": 26.560981183999957,
+   "rrt_plans": 1,
+   "recoveries": 0,
+   "distance_remaining_m": 0.04274328425526619,
+   "final_pose": [
+    5.021778100491095,
+    0.9276811102862961,
+    -0.10093270850236384
+   ],
+   "round": 2,
+   "planner": "rrt",
+   "waypoint": "2",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795535087.8093112,
+   "t_end": 1795535111.7829955,
+   "duration_s": 23.366296413999862,
+   "rrt_plans": 2,
+   "recoveries": 0,
+   "distance_remaining_m": 0.09429106116294861,
+   "final_pose": [
+    5.375835842872165,
+    3.020147725837798,
+    2.976487165104697
+   ],
+   "round": 2,
+   "planner": "rrt",
+   "waypoint": "3",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795535112.0580401,
+   "t_end": 1795535180.9514008,
+   "duration_s": 67.06822584399993,
+   "rrt_plans": 19,
+   "recoveries": 4,
+   "distance_remaining_m": 0.0,
+   "final_pose": [
+    0.4364016338054779,
+    1.439319757464936,
+    0.7028571424809372
+   ],
+   "round": 2,
+   "planner": "rrt",
+   "waypoint": "4",
+   "attempt": 1,
+   "result": "succeeded"
+  }
+ ]
+}

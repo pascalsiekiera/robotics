@@ -6,7 +6,7 @@ namespace rrt_planner {
 
 RRTPlanner::RRTPlanner(nav2_costmap_2d::Costmap2DROS * costmap,
         const rrt_params & params) :
-        params_(params), collision_dect_(costmap, params.cost_threshold) {
+        params_(params), collision_dect_(costmap, params.cost_threshold, params.allow_unknown) {
 
     costmap_ = costmap->getCostmap();
 

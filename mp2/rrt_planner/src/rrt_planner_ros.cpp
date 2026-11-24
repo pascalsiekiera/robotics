@@ -29,6 +29,7 @@ void RRTPlannerROS::configure(
   node->declare_parameter(name_ + ".rrt.goal_bias", 0.0);
   node->declare_parameter(name_ + ".rrt.cost_threshold", 253);  // 253 = INSCRIBED_INFLATED_OBSTACLE
   node->declare_parameter(name_ + ".rrt.smoothing", false);
+  node->declare_parameter(name_ + ".rrt.allow_unknown", false);
   node->declare_parameter(name_ + ".rrt.seed", 0);
 
   params_.goal_tolerance = node->get_parameter(name_ + ".goal_tolerance").as_double();
@@ -39,6 +40,7 @@ void RRTPlannerROS::configure(
   params_.cost_threshold = static_cast<unsigned char>(
     node->get_parameter(name_ + ".rrt.cost_threshold").as_int());
   params_.smoothing      = node->get_parameter(name_ + ".rrt.smoothing").as_bool();
+  params_.allow_unknown  = node->get_parameter(name_ + ".rrt.allow_unknown").as_bool();
   params_.seed           = static_cast<unsigned int>(node->get_parameter(name_ + ".rrt.seed").as_int());
 
   // Publisher for the planned path (visualised in RViz2 / Foxglove).
@@ -52,10 +54,12 @@ void RRTPlannerROS::configure(
 
   RCLCPP_INFO(node->get_logger(),
     "[RRTPlannerROS] Configured with goal_tolerance=%.2f, step=%.2f, "
-    "min_nodes=%d, max_nodes=%d, goal_bias=%.2f, cost_threshold=%d, smoothing=%d, seed=%u",
+    "min_nodes=%d, max_nodes=%d, goal_bias=%.2f, cost_threshold=%d, smoothing=%d, "
+    "allow_unknown=%d, seed=%u",
     params_.goal_tolerance, params_.step,
     params_.min_num_nodes, params_.max_num_nodes, params_.goal_bias,
-    static_cast<int>(params_.cost_threshold), static_cast<int>(params_.smoothing), params_.seed);
+    static_cast<int>(params_.cost_threshold), static_cast<int>(params_.smoothing),
+    static_cast<int>(params_.allow_unknown), params_.seed);
 }
 
 void RRTPlannerROS::cleanup()

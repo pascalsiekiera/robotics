@@ -1,0 +1,77 @@
+{
+ "tag": "dijkstra_rrt",
+ "waypoints_file": "/mnt/robotics/mp2/config/waypoints_lsdc3.yaml",
+ "map": "mp1/maps/map_2a_merged.yaml",
+ "waypoints": [
+  {
+   "name": "1",
+   "x": 2.8,
+   "y": 3.5,
+   "yaw": -0.8465463260467496
+  },
+  {
+   "name": "2",
+   "x": 5.1,
+   "y": 0.9,
+   "yaw": 1.523213223517913
+  },
+  {
+   "name": "3",
+   "x": 5.2,
+   "y": 3.0,
+   "yaw": -2.8134727585744876
+  },
+  {
+   "name": "4",
+   "x": 0.5,
+   "y": 1.4,
+   "yaw": 0.7399748839758713
+  }
+ ],
+ "planners": [
+  "dijkstra",
+  "rrt"
+ ],
+ "behavior_trees": {
+  "dijkstra": "/opt/ros/humble/share/nav2_bt_navigator/behavior_trees/navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml",
+  "rrt": "/tmp/tmpvso6jv2t_bt_rrt.xml"
+ },
+ "attempts": [
+  {
+   "t_start": 1795532649.5080192,
+   "t_end": 1795532724.3509536,
+   "duration_s": 73.25464136400024,
+   "rrt_plans": 0,
+   "recoveries": 7,
+   "distance_remaining_m": 7.096793174743652,
+   "final_pose": [
+    2.2632445463762263,
+    -0.6877348686070541,
+    -3.1031328993844163
+   ],
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "1",
+   "attempt": 1,
+   "result": "aborted"
+  },
+  {
+   "t_start": 1795532724.5509355,
+   "t_end": 1795532724.5529823,
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "1",
+   "attempt": 2,
+   "result": "rejected"
+  },
+  {
+   "t_start": 1795532724.763221,
+   "t_end": 1795532724.7806952,
+   "round": 1,
+   "planner": "dijkstra",
+   "waypoint": "2",
+   "attempt": 1,
+   "result": "rejected"
+  }
+ ]
+}

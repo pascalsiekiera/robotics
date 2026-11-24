@@ -3,7 +3,8 @@
 namespace rrt_planner {
 
 CollisionDetector::CollisionDetector(nav2_costmap_2d::Costmap2DROS * costmap,
-        unsigned char cost_threshold) : cost_threshold_(cost_threshold) {
+        unsigned char cost_threshold, bool allow_unknown) :
+        cost_threshold_(cost_threshold), allow_unknown_(allow_unknown) {
 
     costmap_ = costmap->getCostmap();
 }
@@ -18,9 +19,10 @@ bool CollisionDetector::inFreeSpace(const double * world_pos) {
 
     unsigned char cost = costmap_->getCost(mx, my);
 
-    // unknown cells are never free, independent of cost_threshold_
+    // unknown cells: free only with allow_unknown_ (as NavFn's allow_unknown), independent of
+    // cost_threshold_ (255 would never be below it)
     if (cost == nav2_costmap_2d::NO_INFORMATION) {
-        return false;
+        return allow_unknown_;
     }
 
     // 253 (INSCRIBED_INFLATED_OBSTACLE) and above: the robot circle touches an obstacle;

@@ -18,8 +18,10 @@ public:
      * @brief   Constructor for the CollisionDetector object.
      * @param   costmap         Pointer to the Nav2 costmap ROS wrapper used for planning.
      * @param   cost_threshold  A cell is free if its cost is below this value (MP2).
+     * @param   allow_unknown   Unknown cells (NO_INFORMATION) count as free (MP2).
      */
-    CollisionDetector(nav2_costmap_2d::Costmap2DROS * costmap, unsigned char cost_threshold);
+    CollisionDetector(nav2_costmap_2d::Costmap2DROS * costmap, unsigned char cost_threshold,
+            bool allow_unknown);
 
     /**
      * @brief   Check whether world_pos is in free space.
@@ -43,6 +45,7 @@ private:
     // which can be after the plugin is configured. The robot radius is already contained in the
     // costmap (inflation layer), so robot_radius_ of the skeleton is not used.
     unsigned char cost_threshold_;
+    bool allow_unknown_;
 };
 
 }  // namespace rrt_planner

@@ -1,0 +1,12 @@
+# Task 2a: waypoints in the LSDC3 lab, map frame of mp1/maps/map_2a_merged.yaml.
+# Placed as in Figure 1 of the assignment, >= 0.55 m from the walls and not in unknown cells of
+# the map. A round visits them in this order; the robot starts at waypoint 4, so a round ends
+# where it started. The yaw at each waypoint is computed by waypoint_nav.py (direction to the
+# next waypoint).
+frame_id: map
+map: mp1/maps/map_2a_merged.yaml
+waypoints:
+  - {name: '1', x: 2.8, y: 3.5}   # above the right end of the table
+  - {name: '2', x: 5.1, y: 0.9}   # niche bottom right
+  - {name: '3', x: 5.2, y: 3.0}   # top right, at the wall
+  - {name: '4', x: 0.5, y: 1.4}   # left below the table (start)

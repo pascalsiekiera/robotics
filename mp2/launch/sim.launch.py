@@ -15,7 +15,8 @@ Controller (controller_server plugin "FollowPath"):
 Global planner used by the behavior tree (Task 1b):
     planner:=dijkstra  "GridBased" (NavFn, default)
     planner:=rrt       "RRT" (mp2/rrt_planner); rrt_smoothing:=true for the smoothed variant,
-                       rrt_cost_threshold:=128 for the variant with more distance to obstacles
+                       rrt_cost_threshold:=128 for the variant with more distance to obstacles,
+                       rrt_allow_unknown:=true to plan through unknown cells (as NavFn, Task 2a)
 The Jazzy version (Gazebo Harmonic) of this file is mp2/jazzy/sim.launch.py.
 
 Run:
@@ -81,6 +82,7 @@ def nav2(context):
     planner = LaunchConfiguration('planner').perform(context)
     smoothing = LaunchConfiguration('rrt_smoothing').perform(context)
     threshold = LaunchConfiguration('rrt_cost_threshold').perform(context)
+    allow_unknown = LaunchConfiguration('rrt_allow_unknown').perform(context)
     if controller not in ('dwb', 'teb'):
         raise RuntimeError(f'controller must be dwb or teb, not {controller!r}')
     if planner not in ('dijkstra', 'rrt'):
@@ -105,6 +107,8 @@ def nav2(context):
             rrt['rrt.smoothing'] = smoothing == 'true'
         if threshold:
             rrt['rrt.cost_threshold'] = int(threshold)
+        if allow_unknown:
+            rrt['rrt.allow_unknown'] = allow_unknown == 'true'
     if controller != 'dwb' or planner != 'dijkstra':
         tmp = tempfile.NamedTemporaryFile('w', suffix=f'_nav2_{controller}_{planner}.yaml', delete=False)
         yaml.safe_dump(params, tmp)
@@ -113,6 +117,7 @@ def nav2(context):
     print(f'[sim] controller {controller}, planner {planner}'
           + (f' (smoothing {smoothing})' if planner == 'rrt' and smoothing else '')
           + (f' (cost threshold {threshold})' if planner == 'rrt' and threshold else '')
+          + (f' (allow unknown {allow_unknown})' if planner == 'rrt' and allow_unknown else '')
           + f', params {params_file}')
     return [IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(NAV2_BRINGUP, 'launch', 'bringup_launch.py')),
@@ -136,6 +141,8 @@ def generate_launch_description():
         DeclareLaunchArgument('planner', default_value='dijkstra', description='dijkstra or rrt'),
         DeclareLaunchArgument('rrt_smoothing', default_value='', description='true/false (planner:=rrt)'),
         DeclareLaunchArgument('rrt_cost_threshold', default_value='', description='e.g. 128 (planner:=rrt)'),
+        DeclareLaunchArgument('rrt_allow_unknown', default_value='',
+                              description='true/false (planner:=rrt)'),
         DeclareLaunchArgument('params_file',
                               default_value=os.path.join(MP2, 'config', 'nav2_params.yaml')),
 

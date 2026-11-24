@@ -1,0 +1,97 @@
+{
+ "tag": "dijkstra_dwb_tol10",
+ "waypoints_file": "/mnt/robotics/mp2/config/waypoints_lsdc3.yaml",
+ "map": "mp1/maps/map_2a_merged.yaml",
+ "waypoints": [
+  {
+   "name": "1",
+   "x": 2.8,
+   "y": 3.5,
+   "yaw": -0.8465463260467496
+  },
+  {
+   "name": "2",
+   "x": 5.1,
+   "y": 0.9,
+   "yaw": 1.523213223517913
+  },
+  {
+   "name": "3",
+   "x": 5.2,
+   "y": 3.0,
+   "yaw": -2.8134727585744876
+  },
+  {
+   "name": "4",
+   "x": 0.5,
+   "y": 1.4,
+   "yaw": 0.7399748839758713
+  }
+ ],
+ "attempts": [
+  {
+   "t_start": 1795523564.2880952,
+   "t_end": 1795523593.5231996,
+   "duration_s": 28.378648144999715,
+   "recoveries": 0,
+   "distance_remaining_m": 0.08573517948389053,
+   "final_pose": [
+    2.862962924662579,
+    3.574824923267113,
+    -2.4809513281181172
+   ],
+   "round": 1,
+   "waypoint": "1",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795523593.8247743,
+   "t_end": 1795523615.9989598,
+   "duration_s": 22.169629848000113,
+   "recoveries": 0,
+   "distance_remaining_m": 0.07673992961645126,
+   "final_pose": [
+    5.19481275694975,
+    0.9489889387679387,
+    -2.6733248504393874
+   ],
+   "round": 1,
+   "waypoint": "2",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795523616.3748708,
+   "t_end": 1795523630.6710045,
+   "duration_s": 13.47041574999912,
+   "recoveries": 0,
+   "distance_remaining_m": 0.06983550637960434,
+   "final_pose": [
+    5.146827061935277,
+    2.9169512453170325,
+    0.8738400293388559
+   ],
+   "round": 1,
+   "waypoint": "3",
+   "attempt": 1,
+   "result": "succeeded"
+  },
+  {
+   "t_start": 1795523631.0582004,
+   "t_end": 1795523663.070482,
+   "duration_s": 31.17054044499946,
+   "recoveries": 0,
+   "distance_remaining_m": 0.09483547508716583,
+   "final_pose": [
+    0.5314521493166898,
+    1.2940288701681015,
+    2.1266092575130977
+   ],
+   "round": 1,
+   "waypoint": "4",
+   "attempt": 1,
+   "result": "succeeded"
+  }
+ ]
+}

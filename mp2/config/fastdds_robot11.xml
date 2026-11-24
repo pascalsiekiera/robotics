@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Task 2: Fast DDS discovery with the robot as a fixed unicast peer, in case the multicast
+     discovery does not get through (WSL2 mirrored networking / lab Wi-Fi).
+     Use in every laptop terminal:
+       export FASTRTPS_DEFAULT_PROFILES_FILE=/mnt/robotics/mp2/config/fastdds_robot11.xml
+     Robot 11 = 10.16.140.11 (ROS_DOMAIN_ID 11); for another robot change the address. -->
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <participant profile_name="robot_peer" is_default_profile="true">
+    <rtps>
+      <builtin>
+        <initialPeersList>
+          <locator>
+            <udpv4>
+              <address>10.16.140.11</address>
+            </udpv4>
+          </locator>
+        </initialPeersList>
+      </builtin>
+    </rtps>
+  </participant>
+</profiles>

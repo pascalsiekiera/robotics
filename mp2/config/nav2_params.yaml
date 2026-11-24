@@ -332,6 +332,7 @@ planner_server:
       rrt.goal_bias: 0.0       # fraction of samples = goal (variant: 0.1)
       rrt.cost_threshold: 253  # cell free if cost < this (253 = inscribed; variant: 128)
       rrt.smoothing: false     # shortcut smoothing (variant: true)
+      rrt.allow_unknown: false # unknown cells (255) count as free, as NavFn allow_unknown (Task 2a)
       rrt.seed: 1              # fixed seed: same request sequence -> same paths (0 = random)
 
 smoother_server:

@@ -15,6 +15,7 @@ namespace rrt_planner {
         double goal_bias;             // fraction of samples that are the goal itself (0 = plain RRT)
         unsigned char cost_threshold; // a cell is free if its cost is below this value
         bool smoothing;               // shortcut smoothing of the finished path
+        bool allow_unknown;           // unknown cells (NO_INFORMATION) count as free
         unsigned int seed;            // random seed (0 = from std::random_device)
     };
 

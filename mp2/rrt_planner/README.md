@@ -21,7 +21,8 @@ BSD-3-Clause, see `LICENSE`). Linked into `~/ros2_ws/src`, see `mp2/README.md`.
 No path after `rrt.max_num_nodes` iterations = failure.
 
 **Collision check** (`CollisionDetector`): a point is free if its cell in the global costmap has a
-cost below `rrt.cost_threshold`; points outside the costmap and unknown cells (255) are never free.
+cost below `rrt.cost_threshold`; points outside the costmap are never free, unknown cells (255) only
+with `rrt.allow_unknown`.
 Only the robot centre is checked, the robot radius is contained in the inflation layer. A segment is
 checked at the costmap resolution (`obstacleBetween`). The costmap is locked while planning.
 
@@ -38,6 +39,7 @@ Under the planner name in the `planner_server` parameters (here `RRT.`, see `mp2
 | `rrt.goal_bias` | 0.0 | fraction of samples that are the goal (0 = plain RRT) |
 | `rrt.cost_threshold` | 253 | cell free if cost < this (253 = inscribed: the robot circle does not touch an obstacle) |
 | `rrt.smoothing` | false | shortcut smoothing of the finished path |
+| `rrt.allow_unknown` | false | unknown cells (255) count as free (as NavFn `allow_unknown`); points outside the costmap stay blocked |
 | `rrt.seed` | 0 | random seed; fixed seed = the same sequence of requests gives the same paths, 0 = random |
 
 ## Topics
